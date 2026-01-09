@@ -1,0 +1,111 @@
+{
+  "brandName": "SchemeSaathi",
+  "nav": {
+    "features": "Features",
+    "languages": "Languages",
+    "schemes": "Schemes",
+    "login": "Login",
+    "logout": "Logout",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "badge": "Trusted by millions of Indians",
+    "title": "Discover Government Schemes in Your Language",
+    "description": "SchemeSaathi is an AI-powered WhatsApp chatbot that helps Indian citizens discover government schemes they're eligible for. Supporting 15+ Indian languages with intelligent eligibility matching and real-time updates.",
+    "startChat": "Start WhatsApp Chat"
+  },
+  "stats": {
+    "languages": "Languages Supported",
+    "schemes": "Government Schemes",
+    "states": "States Covered",
+    "responseTime": "Response Time"
+  },
+  "features": {
+    "title": "Built for Modern India",
+    "subtitle": "Advanced technology meets accessibility to provide the best experience for Indian citizens",
+    "badge": "Powerful Features",
+    "items": {
+      "aiProcessing": {
+        "title": "Advanced AI Processing",
+        "description": "Powered by Gemini 2.0 Flash with natural language understanding across 15+ Indian languages"
+      },
+      "whatsappIntegration": {
+        "title": "WhatsApp Integration",
+        "description": "Seamless messaging experience through Twilio WhatsApp Business API with instant responses"
+      },
+      "eligibilityMatching": {
+        "title": "Smart Eligibility Matching",
+        "description": "AI extracts eligibility criteria from conversational text with 95% accuracy"
+      },
+      "governmentData": {
+        "title": "Real Government Data",
+        "description": "Direct integration with myScheme API and comprehensive fallback database"
+      },
+      "conversationMemory": {
+        "title": "Conversation Memory",
+        "description": "Remembers user preferences and eligibility data across multiple conversations"
+      },
+      "analyticsDashboard": {
+        "title": "Analytics Dashboard",
+        "description": "Modern admin interface with real-time user analytics and scheme recommendations"
+      }
+    }
+  },
+  "languages": {
+    "title": "15+ Indian Languages",
+    "subtitle": "Communicate naturally in your mother tongue with AI-powered language processing that understands cultural context and regional nuances",
+    "badge": "Multilingual Support",
+    "clickToChat": "Click to chat in {{language}}",
+    "moreLanguages": "More Regional Languages",
+    "moreDescription": "Including Sanskrit, Bodo, Dogri, Konkani, Manipuri, Nepali, Santhali, and other regional dialects across all Indian states"
+  },
+  "cta": {
+    "badge": "Ready to Get Started",
+    "title": "Ready to Discover Your Benefits?",
+    "description": "Join millions of Indians who have discovered government schemes through SchemeSaathi. Start your journey in any of 15+ languages and unlock benefits you never knew existed.",
+    "startChat": "Start WhatsApp Chat",
+    "findSchemes": "Find My Schemes",
+    "adminLogin": "Admin Login",
+    "viewDashboard": "View Dashboard",
+    "stats": {
+      "languages": "Languages",
+      "schemes": "Schemes",
+      "citizensHelped": "Citizens Helped"
+    },
+    "features": {
+      "secure": "Secure & Privacy-First",
+      "available": "Available 24/7",
+      "instant": "Instant Responses"
+    }
+  },
+  "footer": {
+    "description": "Empowering Indian citizens to discover and access government schemes in their native language through AI-powered assistance.",
+    "features": "Features",
+    "languages": "Languages",
+    "resources": "Resources",
+    "copyright": "Built with ❤️ for Indian citizens",
+    "tagline": "\"Together, Development, Everyone's Language\"",
+    "items": {
+      "languageSupport": "15+ Language Support",
+      "whatsappIntegration": "WhatsApp Integration",
+      "aiMatching": "AI-Powered Matching",
+      "realTimeUpdates": "Real-time Updates",
+      "languageList": "Hindi, English, Bengali",
+      "languageList2": "Tamil, Telugu, Marathi",
+      "languageList3": "Gujarati, Kannada, Malayalam",
+      "moreLanguages": "+ 6 more languages",
+      "adminDashboard": "Admin Dashboard",
+      "mySchemePortal": "myScheme Portal",
+      "githubRepo": "GitHub Repository"
+    }
+  },
+  "mobile": {
+    "settings": "Settings",
+    "quickActions": "Quick Actions",
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "common": {
+    "appSubtitle": "Government Schemes Assistant"
+  }
+}
