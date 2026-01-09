@@ -1,6 +1,8 @@
 export interface User {
   id?: string
-  phone: string
+  phone?: string
+  telegram_id?: string
+  first_name?: string
   language_preference: string
   eligibility_data: any
   conversation_history: any[]

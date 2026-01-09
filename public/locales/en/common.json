@@ -11,8 +11,9 @@
   "hero": {
     "badge": "Trusted by millions of Indians",
     "title": "Discover Government Schemes in Your Language",
-    "description": "SchemeSaathi is an AI-powered WhatsApp chatbot that helps Indian citizens discover government schemes they're eligible for. Supporting 15+ Indian languages with intelligent eligibility matching and real-time updates.",
-    "startChat": "Start WhatsApp Chat"
+    "description": "SchemeSaathi is an AI-powered chatbot that helps Indian citizens discover government schemes they're eligible for. Supporting 15+ Indian languages with intelligent eligibility matching and real-time updates.",
+    "startChat": "Start WhatsApp Chat",
+    "startTelegram": "Start Telegram Chat"
   },
   "stats": {
     "languages": "Languages Supported",
@@ -32,6 +33,10 @@
       "whatsappIntegration": {
         "title": "WhatsApp Integration",
         "description": "Seamless messaging experience through Twilio WhatsApp Business API with instant responses"
+      },
+      "telegramIntegration": {
+        "title": "Telegram Bot Integration",
+        "description": "Rich interactive experience with inline keyboards and instant callbacks for better user engagement"
       },
       "eligibilityMatching": {
         "title": "Smart Eligibility Matching",
@@ -64,8 +69,8 @@
     "title": "Ready to Discover Your Benefits?",
     "description": "Join millions of Indians who have discovered government schemes through SchemeSaathi. Start your journey in any of 15+ languages and unlock benefits you never knew existed.",
     "startChat": "Start WhatsApp Chat",
+    "startTelegram": "Start Telegram Chat",
     "findSchemes": "Find My Schemes",
-    "adminLogin": "Admin Login",
     "viewDashboard": "View Dashboard",
     "stats": {
       "languages": "Languages",
@@ -88,6 +93,7 @@
     "items": {
       "languageSupport": "15+ Language Support",
       "whatsappIntegration": "WhatsApp Integration",
+      "telegramIntegration": "Telegram Bot",
       "aiMatching": "AI-Powered Matching",
       "realTimeUpdates": "Real-time Updates",
       "languageList": "Hindi, English, Bengali",
@@ -104,6 +110,18 @@
     "quickActions": "Quick Actions",
     "language": "Language",
     "theme": "Theme"
+  },
+  "telegram": {
+    "startChat": "Start Telegram Chat",
+    "connecting": "Connecting...",
+    "farmerSchemes": "Farmer Schemes",
+    "studentSchemes": "Student Schemes",
+    "womenSchemes": "Women Schemes",
+    "businessSchemes": "Business Schemes",
+    "findSchemes": "Find Schemes",
+    "checkEligibility": "Check Eligibility",
+    "changeLanguage": "Change Language",
+    "help": "Help"
   },
   "common": {
     "appSubtitle": "Government Schemes Assistant"

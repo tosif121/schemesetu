@@ -640,7 +640,7 @@ export default function AdminDashboard() {
                       <TableHead className="w-[180px] text-gray-700 dark:text-gray-300">
                         <div className="flex items-center">
                           <Phone className="w-4 h-4 mr-2" />
-                          Phone Number
+                          Contact / Platform
                         </div>
                       </TableHead>
                       <TableHead className="text-gray-700 dark:text-gray-300">
@@ -671,9 +671,12 @@ export default function AdminDashboard() {
                   </TableHeader>
                   <TableBody>
                     {users.slice(0, 50).map((user) => (
-                      <TableRow key={user.phone} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 border-gray-200 dark:border-gray-800">
+                      <TableRow key={user.phone || user.telegram_id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 border-gray-200 dark:border-gray-800">
                         <TableCell className="font-mono text-sm text-gray-900 dark:text-white">
-                          {user.phone.replace(/(\d{2})(\d{5})(\d{5})/, '+91 $1 $2 $3')}
+                          {user.phone ? 
+                            user.phone.replace(/(\d{2})(\d{5})(\d{5})/, '+91 $1 $2 $3') : 
+                            `@${user.telegram_id} (Telegram)`
+                          }
                         </TableCell>
                         <TableCell>
                           {user.language_preference ? (

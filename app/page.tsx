@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useWhatsApp } from './lib/whatsapp-client';
+import { useTelegram } from './lib/telegram-client';
 import { useLanguage } from './Context/LanguageContext';
 import {
   Bot,
@@ -44,6 +45,7 @@ export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const whatsapp = useWhatsApp();
+  const telegram = useTelegram();
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -107,6 +109,13 @@ export default function HomePage() {
       icon: MessageCircle,
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-50 dark:bg-green-950/30',
+    },
+    {
+      title: t('features.items.telegramIntegration.title'),
+      description: t('features.items.telegramIntegration.description'),
+      icon: Bot,
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-50 dark:bg-blue-950/30',
     },
     {
       title: t('features.items.eligibilityMatching.title'),
@@ -397,7 +406,9 @@ export default function HomePage() {
                   <div className="space-y-4">
                     {/* Language Selector in Mobile Menu */}
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('mobile.language')}</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('mobile.language')}
+                      </span>
                       <LanguageSelector isScrolled={true} />
                     </div>
 
@@ -445,7 +456,7 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* Mobile WhatsApp Actions */}
+                {/* Mobile WhatsApp & Telegram Actions */}
                 <div className="pt-6 border-t border-gray-200 dark:border-gray-700 space-y-3">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                     {t('mobile.quickActions')}
@@ -459,6 +470,16 @@ export default function HomePage() {
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     {t('cta.startChat')}
+                  </Button>
+                  <Button
+                    className="w-full justify-start text-left bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => {
+                      telegram.startChat('en');
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <Bot className="w-4 h-4 mr-2" />
+                    {t('cta.startTelegram')}
                   </Button>
                   <Button
                     variant="outline"
@@ -521,6 +542,26 @@ export default function HomePage() {
                 {/* Pulsing ring effect */}
                 <div className="absolute inset-0 rounded-lg bg-green-400/30 animate-ping group-hover:animate-none"></div>
               </Button>
+
+              <Button
+                size="lg"
+                className="relative bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold shadow-2xl transform hover:scale-105 transition-all duration-300 ease-out overflow-hidden group border-0"
+                onClick={() => telegram.startChat('en')}
+              >
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+
+                {/* Telegram icon */}
+                <svg className="h-8 w-8 mr-3 group-hover:animate-bounce" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                </svg>
+
+                {/* Text with glow effect */}
+                <span className="relative z-10 text-lg tracking-wide drop-shadow-lg">{t('hero.startTelegram')}</span>
+
+                {/* Pulsing ring effect */}
+                <div className="absolute inset-0 rounded-lg bg-blue-400/30 animate-ping group-hover:animate-none"></div>
+              </Button>
             </div>
           </div>
         </div>
@@ -548,12 +589,8 @@ export default function HomePage() {
             <Badge className="mb-4 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800">
               {t('features.badge')}
             </Badge>
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              {t('features.title')}
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              {t('features.subtitle')}
-            </p>
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{t('features.title')}</h3>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{t('features.subtitle')}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
@@ -584,7 +621,9 @@ export default function HomePage() {
               <Globe className="mr-2 h-4 w-4" />
               {t('languages.badge')}
             </Badge>
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">{t('languages.title')}</h3>
+            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              {t('languages.title')}
+            </h3>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               {t('languages.subtitle')}
             </p>
@@ -640,7 +679,9 @@ export default function HomePage() {
                 <div className="p-2 bg-[#4299eb] rounded-full">
                   <Languages className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-lg font-bold text-gray-800 dark:text-gray-200">{t('languages.moreLanguages')}</span>
+                <span className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                  {t('languages.moreLanguages')}
+                </span>
               </div>
               <p className="text-gray-600 dark:text-gray-400 text-center max-w-md leading-relaxed">
                 {t('languages.moreDescription')}
@@ -714,6 +755,16 @@ export default function HomePage() {
 
                   <Button
                     size="lg"
+                    className="bg-white text-[#4299eb] hover:bg-blue-50 font-bold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 min-w-[200px]"
+                    onClick={() => telegram.startChat('hi')}
+                  >
+                    <Bot className="w-5 h-5 mr-2" />
+                    {t('cta.startTelegram')}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+
+                  <Button
+                    size="lg"
                     variant="outline"
                     className="border-2 border-white text-white hover:bg-white hover:text-[#4299eb] font-bold px-8 py-4 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 min-w-[180px] bg-transparent"
                     onClick={() => whatsapp.findSchemes('en')}
@@ -721,30 +772,6 @@ export default function HomePage() {
                     <Database className="w-5 h-5 mr-2" />
                     {t('cta.findSchemes')}
                   </Button>
-
-                  {isAuthenticated ? (
-                    <Link href="/admin">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="border-2 border-white text-white hover:bg-white hover:text-[#4299eb] font-bold px-8 py-4 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 min-w-[180px] bg-transparent"
-                      >
-                        <BarChart3 className="w-5 h-5 mr-2" />
-                        {t('cta.viewDashboard')}
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link href="/admin">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="border-2 border-white text-white hover:bg-white hover:text-[#4299eb] font-bold px-8 py-4 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 min-w-[160px] bg-transparent"
-                      >
-                        <BarChart3 className="w-5 h-5 mr-2" />
-                        {t('cta.adminLogin')}
-                      </Button>
-                    </Link>
-                  )}
                 </div>
 
                 {/* Additional Info */}
@@ -782,9 +809,7 @@ export default function HomePage() {
                   <p className="text-xs text-gray-400">{t('common.appSubtitle')}</p>
                 </div>
               </div>
-              <p className="text-gray-400 dark:text-gray-500 leading-relaxed">
-                {t('footer.description')}
-              </p>
+              <p className="text-gray-400 dark:text-gray-500 leading-relaxed">{t('footer.description')}</p>
             </div>
 
             <div>
@@ -800,6 +825,10 @@ export default function HomePage() {
                 <li className="flex items-center">
                   <CheckCircle className="w-3 h-3 mr-2 text-green-400" />
                   {t('footer.items.whatsappIntegration')}
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-3 h-3 mr-2 text-blue-400" />
+                  {t('footer.items.telegramIntegration')}
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-3 h-3 mr-2 text-green-400" />
@@ -869,11 +898,11 @@ export default function HomePage() {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center text-gray-400 dark:text-gray-500">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <p>&copy; {new Date().getFullYear()} {t('brandName')}. {t('footer.copyright')}</p>
+              <p>
+                &copy; {new Date().getFullYear()} {t('brandName')}. {t('footer.copyright')}
+              </p>
             </div>
-            <div className="flex items-center space-x-4">
-              {t('footer.tagline')}
-            </div>
+            <div className="flex items-center space-x-4">{t('footer.tagline')}</div>
           </div>
         </div>
       </footer>
