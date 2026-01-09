@@ -1,10 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { EligibilityCriteria } from './types'
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+// Initialize Gemini with fallback for build time
+const apiKey = process.env.GEMINI_API_KEY || ''
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null
 
 // Using Gemini 2.0 Flash for better multilingual support
-const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' }) : null
 
 // All major Indian languages supported
 const SUPPORTED_LANGUAGES = {
@@ -35,6 +37,19 @@ const SUPPORTED_LANGUAGES = {
 }
 
 export async function extractEligibility(userInput: string): Promise<EligibilityCriteria> {
+  if (!model) {
+    console.warn('Gemini not available, returning empty eligibility')
+    return {
+      age: null,
+      income: null,
+      state: null,
+      occupation: null,
+      category: null,
+      gender: null,
+      disability: null
+    }
+  }
+
   const prompt = `You are SchemeSaathi, a helpful assistant for Indian government schemes. Extract eligibility criteria from this message in JSON format. Handle all Indian languages including Hindi, English, Tamil, Bengali, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, Urdu, Sanskrit, Nepali, Sinhala, Myanmar, Kashmiri, Sindhi, Konkani, Manipuri, Dogri, Santali, and Tibetan.
 
 Extract these fields:
@@ -90,6 +105,18 @@ export async function generateResponse(
   schemes: any[],
   language: string = 'en'
 ): Promise<string> {
+  if (!model) {
+    console.warn('Gemini not available, returning fallback response')
+    const fallbackResponses = {
+      'hi': 'माफ करें, AI सेवा अभी उपलब्ध नहीं है। कृपया बाद में कोशिश करें।',
+      'ta': 'மன்னிக்கவும், AI சேவை தற்போது கிடைக்கவில்லை. பின்னர் முயற்சிக்கவும்.',
+      'bn': 'দুঃখিত, AI সেবা এখন উপলব্ধ নেই। পরে চেষ্টা করুন।',
+      'te': 'క్షమించండి, AI సేవ ప్రస్తుతం అందుబాటులో లేదు. దయచేసి తర్వాత ప্రయత్నించండి।'
+    }
+    return fallbackResponses[language as keyof typeof fallbackResponses] || 
+           'Sorry, AI service is currently unavailable. Please try again later.'
+  }
+
   const languageName = SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES] || 'English'
 
   const prompt = `You are SchemeSaathi, a helpful WhatsApp chatbot that helps Indian citizens find government schemes. 
@@ -124,7 +151,7 @@ Response:`
       'hi': 'माफ करें, कुछ तकनीकी समस्या है। कृपया बाद में कोशिश करें। अधिक जानकारी के लिए myscheme.gov.in पर जाएं।',
       'ta': 'மன்னிக்கவும், தொழில்நுட்ப சிக்கல் உள்ளது. பின்னர் முயற்சிக்கவும். மேலும் தகவலுக்கு myscheme.gov.in ஐ பார்வையிடவும்.',
       'bn': 'দুঃখিত, একটি প্রযুক্তিগত সমস্যা আছে। পরে চেষ্টা করুন। আরও তথ্যের জন্য myscheme.gov.in দেখুন।',
-      'te': 'క్షమించండి, సాంకేతిక సమస్య ఉంది. దయచేసి తర్వాత ప్రయత్నించండి. మరింత సమాచారం కోసం myscheme.gov.in చూడండి.',
+      'te': 'క్షమించండి, సాంకేతిక సమస్య ఉంది. దయచేసి తర్వాత ప্రయత్నించండి. మరింత సమాచారం కోసం myscheme.gov.in చూడండి.',
       'mr': 'माफ करा, तांत्रिक समस्या आहे. कृपया नंतर प्रयत्न करा. अधिक माहितीसाठी myscheme.gov.in ला भेट द्या.',
       'gu': 'માફ કરશો, તકનીકી સમસ્યા છે. કૃપા કરીને પછીથી પ્રયાસ કરો. વધુ માહિતી માટે myscheme.gov.in જુઓ.',
       'kn': 'ಕ್ಷಮಿಸಿ, ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆ ಇದೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ. ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ myscheme.gov.in ನೋಡಿ.',
@@ -141,6 +168,11 @@ Response:`
 }
 
 export async function detectLanguage(text: string): Promise<string> {
+  if (!model) {
+    console.warn('Gemini not available, defaulting to English')
+    return 'en'
+  }
+
   const prompt = `Detect the primary language of this text and return only the language code from these options:
 - "en" for English
 - "hi" for Hindi

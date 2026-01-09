@@ -1,18 +1,38 @@
 import { createClient } from '@supabase/supabase-js'
 import { User } from './types'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Get environment variables with fallbacks for build time
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Only create client if we have valid credentials
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null
+
+// Helper function to check if Supabase is available
+function isSupabaseAvailable(): boolean {
+  return supabase !== null && supabaseUrl.length > 0 && supabaseAnonKey.length > 0
+}
 
 // Helper functions for user management
 export async function getOrCreateUser(identifier: string, platform: 'whatsapp' | 'telegram' = 'whatsapp'): Promise<User> {
+  if (!isSupabaseAvailable()) {
+    console.warn('Supabase not available, returning mock user')
+    return {
+      id: 'mock-id',
+      [platform === 'telegram' ? 'telegram_id' : 'phone']: identifier,
+      language_preference: 'en',
+      eligibility_data: {},
+      conversation_history: []
+    }
+  }
+
   try {
     const searchField = platform === 'telegram' ? 'telegram_id' : 'phone'
     
     // First try to get existing user
-    const { data: existingUser, error: fetchError } = await supabase
+    const { data: existingUser, error: fetchError } = await supabase!
       .from('users')
       .select('*')
       .eq(searchField, identifier)
@@ -30,7 +50,7 @@ export async function getOrCreateUser(identifier: string, platform: 'whatsapp' |
       ...(platform === 'telegram' ? { telegram_id: identifier } : { phone: identifier })
     }
 
-    const { data: newUser, error: createError } = await supabase
+    const { data: newUser, error: createError } = await supabase!
       .from('users')
       .insert(userData)
       .select()
@@ -50,9 +70,21 @@ export async function getOrCreateUser(identifier: string, platform: 'whatsapp' |
 
 // Specific function for Telegram users
 export async function getOrCreateTelegramUser(telegramId: string, firstName?: string): Promise<User> {
+  if (!isSupabaseAvailable()) {
+    console.warn('Supabase not available, returning mock user')
+    return {
+      id: 'mock-id',
+      telegram_id: telegramId,
+      first_name: firstName,
+      language_preference: 'en',
+      eligibility_data: {},
+      conversation_history: []
+    }
+  }
+
   try {
     // First try to get existing user
-    const { data: existingUser, error: fetchError } = await supabase
+    const { data: existingUser, error: fetchError } = await supabase!
       .from('users')
       .select('*')
       .eq('telegram_id', telegramId)
@@ -63,7 +95,7 @@ export async function getOrCreateTelegramUser(telegramId: string, firstName?: st
     }
 
     // Create new user if doesn't exist
-    const { data: newUser, error: createError } = await supabase
+    const { data: newUser, error: createError } = await supabase!
       .from('users')
       .insert({
         telegram_id: telegramId,
@@ -88,10 +120,15 @@ export async function getOrCreateTelegramUser(telegramId: string, firstName?: st
 }
 
 export async function updateUserEligibility(identifier: string, eligibility: any, platform: 'whatsapp' | 'telegram' = 'whatsapp'): Promise<void> {
+  if (!isSupabaseAvailable()) {
+    console.warn('Supabase not available, skipping user eligibility update')
+    return
+  }
+
   try {
     const searchField = platform === 'telegram' ? 'telegram_id' : 'phone'
     
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('users')
       .update({ 
         eligibility_data: eligibility,
@@ -110,10 +147,15 @@ export async function updateUserEligibility(identifier: string, eligibility: any
 }
 
 export async function updateUserLanguage(identifier: string, language: string, platform: 'whatsapp' | 'telegram' = 'whatsapp'): Promise<void> {
+  if (!isSupabaseAvailable()) {
+    console.warn('Supabase not available, skipping user language update')
+    return
+  }
+
   try {
     const searchField = platform === 'telegram' ? 'telegram_id' : 'phone'
     
-    const { error } = await supabase
+    const { error } = await supabase!
       .from('users')
       .update({ 
         language_preference: language,
@@ -138,11 +180,16 @@ export async function addConversationMessage(
   language: string,
   platform: 'whatsapp' | 'telegram' = 'whatsapp'
 ): Promise<void> {
+  if (!isSupabaseAvailable()) {
+    console.warn('Supabase not available, skipping conversation message')
+    return
+  }
+
   try {
     const searchField = platform === 'telegram' ? 'telegram_id' : 'phone'
     
     // Get current conversation history
-    const { data: user, error: fetchError } = await supabase
+    const { data: user, error: fetchError } = await supabase!
       .from('users')
       .select('conversation_history')
       .eq(searchField, identifier)
@@ -165,7 +212,7 @@ export async function addConversationMessage(
     const updatedHistory = [...currentHistory, newMessage]
 
     // Update conversation history
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabase!
       .from('users')
       .update({ 
         conversation_history: updatedHistory,
