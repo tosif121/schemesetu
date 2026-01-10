@@ -9,7 +9,6 @@ import { Separator } from '@/components/ui/separator';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useWhatsApp } from './lib/whatsapp-client';
-import { useTelegram } from './lib/telegram-client';
 import { useLanguage } from './Context/LanguageContext';
 import {
   Bot,
@@ -45,7 +44,6 @@ export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const whatsapp = useWhatsApp();
-  const telegram = useTelegram();
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -109,13 +107,6 @@ export default function HomePage() {
       icon: MessageCircle,
       color: 'text-green-600 dark:text-green-400',
       bgColor: 'bg-green-50 dark:bg-green-950/30',
-    },
-    {
-      title: t('features.items.telegramIntegration.title'),
-      description: t('features.items.telegramIntegration.description'),
-      icon: Bot,
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-950/30',
     },
     {
       title: t('features.items.eligibilityMatching.title'),
@@ -456,7 +447,7 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* Mobile WhatsApp & Telegram Actions */}
+                {/* Mobile WhatsApp Actions */}
                 <div className="pt-6 border-t border-gray-200 dark:border-gray-700 space-y-3">
                   <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                     {t('mobile.quickActions')}
@@ -470,16 +461,6 @@ export default function HomePage() {
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     {t('cta.startChat')}
-                  </Button>
-                  <Button
-                    className="w-full justify-start text-left bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => {
-                      telegram.startChat('en');
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    <Bot className="w-4 h-4 mr-2" />
-                    {t('cta.startTelegram')}
                   </Button>
                   <Button
                     variant="outline"

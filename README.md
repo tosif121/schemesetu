@@ -1,153 +1,364 @@
-# SchemeSaathi - Multilingual WhatsApp Chatbot for Government Schemes
+# SchemeSaathi - AI-Powered Government Schemes Platform 🇮🇳
 
-SchemeSaathi is a comprehensive WhatsApp chatbot that helps Indian citizens discover government schemes they're eligible for. It supports **24+ major Indian languages** and uses advanced AI to extract eligibility criteria from natural language messages.
+SchemeSaathi is a comprehensive platform that helps Indian citizens discover government schemes they're eligible for through multiple channels. It features a **multilingual Next.js website** and an **AI-powered Telegram bot** supporting **15+ Indian languages**.
 
-## 🌟 Features
+## 🌟 Platform Overview
 
-- 🤖 **Advanced Multilingual AI**: Powered by Gemini 2.0 Flash for natural language processing in 24+ Indian languages
-- 📱 **WhatsApp Integration**: Seamless messaging through Twilio WhatsApp Business API
-- 🎯 **Smart Eligibility Matching**: Extracts age, income, state, occupation, category, gender, and disability status
-- 💾 **Conversation History**: Stores user interactions and preferences in Supabase
-- 🏛️ **Real Government Data**: Integration with myScheme API and fallback to comprehensive scheme database
-- 📊 **Modern Admin Dashboard**: Built with shadcn/ui for monitoring users and system statistics
+### 🌐 **Next.js Website** (`/schemesetu`)
+Modern web application with multilingual support and WhatsApp integration
 
-## 🗣️ Supported Languages
+### 🤖 **Telegram Bot** (`/telegram-bot`)  
+Standalone AI-powered bot using Perplexity Sonar Pro for intelligent scheme matching
 
-### Official Languages (22)
-Hindi, English, Bengali, Marathi, Telugu, Tamil, Gujarati, Urdu, Kannada, Odia, Malayalam, Punjabi, Assamese, Santali, Kashmiri, Nepali, Sindhi, Dogri, Konkani, Manipuri, Tibetan, Sanskrit
+---
 
-### Additional Support
-Sinhala, Myanmar (for diaspora communities)
+## 🚀 **Next.js Website Features**
 
-## 🛠️ Tech Stack
+- 🌍 **15+ Indian Languages**: Complete translation system with smart fallbacks
+- 📱 **WhatsApp Integration**: Seamless messaging through Twilio Business API
+- 🎯 **Smart Eligibility Matching**: AI-powered scheme recommendations
+- 💾 **User Management**: Supabase integration with conversation history
+- 📊 **Admin Dashboard**: Built with shadcn/ui for monitoring and analytics
+- 🏛️ **Government Schemes Database**: Comprehensive scheme information
 
-- **Frontend**: Next.js 16.1.1 with App Router + TypeScript
-- **Database**: Supabase (PostgreSQL) with comprehensive multilingual schema
-- **AI**: Google Gemini 2.0 Flash for multilingual NLP
+### **Supported Languages**
+English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, Urdu, Kashmiri, Maithili
+
+### **Tech Stack**
+- **Frontend**: Next.js 15+ with App Router + TypeScript
+- **Database**: Supabase (PostgreSQL)
+- **AI**: Google Gemini AI for NLP
 - **Messaging**: Twilio WhatsApp Business API
-- **UI**: shadcn/ui components with Tailwind CSS
-- **HTTP Client**: Axios for reliable API calls
-- **Deployment**: Vercel with edge functions
+- **UI**: shadcn/ui + Tailwind CSS
+- **Deployment**: Vercel
 
-## 🚀 Quick Start
+---
 
-### 1. Environment Setup
+## 🤖 **Telegram Bot Features**
 
+- 🧠 **Perplexity Sonar Pro**: Advanced AI for natural language understanding
+- 📱 **Interactive Keyboards**: Quick action buttons for easy navigation
+- 🎯 **Eligibility-Only Results**: Shows only schemes users can actually apply for
+- 🌐 **Multilingual Support**: 15+ Indian languages with native scripts
+- 📊 **Structured Input**: Simple format - `Age City State Occupation Income`
+- 🔄 **Fallback System**: Works even when AI is unavailable
+
+### **Bot Commands**
+- `/start` - Welcome message and quick actions
+- `/help` - Usage instructions and examples
+- `/language` - Change preferred language
+- `/schemes` - Browse popular schemes
+
+### **Tech Stack**
+- **Runtime**: Node.js with Telegraf framework
+- **AI**: Perplexity Sonar Pro API
+- **Database**: Supabase (shared with website)
+- **Deployment**: Standalone server
+
+---
+
+## 🛠️ **Quick Start**
+
+### **Prerequisites**
+- Node.js 18+
+- Supabase account
+- Telegram Bot Token (from @BotFather)
+- Perplexity API key
+- Twilio account (for WhatsApp)
+
+### **1. Clone Repository**
 ```bash
+git clone <repository-url>
+cd schemesetu
+```
+
+### **2. Setup Next.js Website**
+```bash
+cd schemesetu
+npm install
+cp .env.local.example .env.local
+# Configure environment variables
+npm run dev
+```
+
+### **3. Setup Telegram Bot**
+```bash
+cd ../telegram-bot
+npm install
+# Configure .env file
+npm start
+```
+
+---
+
+## ⚙️ **Environment Configuration**
+
+### **Next.js Website** (`.env.local`)
+```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# Gemini AI
+# AI
 GEMINI_API_KEY=your-gemini-api-key
 
-# Twilio WhatsApp
+# WhatsApp
 TWILIO_ACCOUNT_SID=your-twilio-sid
 TWILIO_AUTH_TOKEN=your-twilio-token
 TWILIO_WHATSAPP_NUMBER=+14155238886
 ```
 
-### 2. Install & Run
+### **Telegram Bot** (`.env`)
+```env
+# Telegram
+BOT_TOKEN=your-bot-token-from-botfather
+BOT_USERNAME=your_bot_username
 
-```bash
-npm install
-npm run build
-npm run dev
+# Supabase (shared)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+
+# AI
+PERPLEXITY_API_KEY=your-perplexity-api-key
 ```
 
-### 3. Database Setup
+---
 
-Create a Supabase project and run this SQL:
+## 🗄️ **Database Setup**
+
+Run this SQL in your Supabase dashboard:
 
 ```sql
--- Create users table with multilingual support
-CREATE TABLE users (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  phone VARCHAR(20) UNIQUE NOT NULL,
-  language_preference VARCHAR(3) CHECK (language_preference IN (
-    'hi', 'en', 'ta', 'bn', 'te', 'mr', 'gu', 'kn', 'ml', 'pa', 
-    'or', 'as', 'ur', 'sa', 'ne', 'si', 'my', 'ks', 'sd', 'kok', 
-    'mni', 'doi', 'sat', 'bo'
-  )),
-  eligibility_data JSONB,
-  conversation_history JSONB DEFAULT '[]'::jsonb,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Users table for both platforms
+CREATE TABLE IF NOT EXISTS users (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    
+    -- WhatsApp fields
+    phone_number VARCHAR(20) UNIQUE,
+    whatsapp_name VARCHAR(255),
+    
+    -- Telegram fields  
+    telegram_id VARCHAR(50) UNIQUE,
+    first_name VARCHAR(255),
+    username VARCHAR(255),
+    
+    -- Common fields
+    language_preference VARCHAR(10) DEFAULT 'en',
+    eligibility_data JSONB DEFAULT '{}',
+    conversation_history JSONB DEFAULT '[]',
+    
+    -- Metadata
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    last_active TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    
+    -- Constraints
+    CONSTRAINT users_platform_check CHECK (
+        (phone_number IS NOT NULL AND whatsapp_name IS NOT NULL) OR 
+        (telegram_id IS NOT NULL AND first_name IS NOT NULL)
+    )
+);
+
+-- Government schemes table
+CREATE TABLE IF NOT EXISTS schemes (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    scheme_id VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(500) NOT NULL,
+    description TEXT,
+    benefits TEXT,
+    eligibility_criteria JSONB DEFAULT '{}',
+    application_url VARCHAR(1000),
+    department VARCHAR(255),
+    category VARCHAR(100),
+    
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create indexes
-CREATE INDEX idx_users_phone ON users(phone);
-CREATE INDEX idx_users_language ON users(language_preference);
-CREATE INDEX idx_users_eligibility ON users USING GIN (eligibility_data);
+CREATE INDEX IF NOT EXISTS idx_users_phone_number ON users(phone_number);
+CREATE INDEX IF NOT EXISTS idx_users_telegram_id ON users(telegram_id);
+CREATE INDEX IF NOT EXISTS idx_users_language_preference ON users(language_preference);
+CREATE INDEX IF NOT EXISTS idx_schemes_category ON schemes(category);
 ```
 
-### 4. Twilio Webhook Setup
+---
 
-Configure your WhatsApp webhook URL in Twilio Console:
-```
-https://your-app.vercel.app/api/webhook
-```
+## 📱 **Usage Examples**
 
-## 🌍 Example Conversations
-
-**English**:
+### **Website (WhatsApp)**
 ```
-User: "I am 30 year old woman from Tamil Nadu, SC category, annual income 3 lakh"
-Bot: "Based on your profile, you're eligible for Ayushman Bharat health insurance (₹5 lakh coverage)..."
+User: "I am 25 year old farmer from Maharashtra with 2 lakh income"
+Response: "You're eligible for PM-KISAN (₹6,000/year) and Kisan Credit Card..."
 ```
 
-**Hindi**:
+### **Telegram Bot**
 ```
-User: "मैं 25 साल का किसान हूं महाराष्ट्र से, सालाना 2 लाख कमाता हूं"
-Bot: "आपकी जानकारी के अनुसार, आप PM-KISAN योजना के लिए पात्र हैं (₹6000 प्रति वर्ष)..."
+Structured: "25 mumbai Maharashtra farmer 200000"
+Natural: "मैं महाराष्ट्र का किसान हूं"
+Response: Shows only eligible schemes with application links
 ```
 
-## 📊 Admin Dashboard
+---
 
-Visit `/admin` to view:
-- User analytics and statistics
-- Language distribution insights
-- State and occupation breakdowns
-- Conversation history tracking
+## 🚀 **Deployment**
 
-## 🔗 API Endpoints
+### **Next.js Website**
+```bash
+# Vercel deployment
+vercel --prod
 
-### POST /api/webhook
-Receives WhatsApp messages from Twilio, processes them with Gemini AI, and responds with matching schemes.
+# Or build locally
+npm run build
+npm start
+```
 
-### GET /api/schemes
-Fetches government schemes from myScheme API with comprehensive eligibility matching.
+### **Telegram Bot**
+```bash
+# PM2 (recommended)
+npm install -g pm2
+pm2 start bot.js --name "schemesaathi-bot"
 
-## 🚀 Deployment
+# Or direct
+npm start
+```
 
-### Vercel Deployment
+---
 
-1. Connect your GitHub repo to Vercel
-2. Add all environment variables in Vercel dashboard
-3. Deploy automatically on push to main
+## 📊 **Admin Dashboard**
 
-## �️ Deivelopment Roadmap
+Access the admin panel at `/admin` to view:
+- **User Analytics**: Platform-wise user statistics
+- **Language Distribution**: Usage across different languages
+- **Scheme Performance**: Most accessed schemes
+- **Conversation Insights**: User interaction patterns
 
-- [ ] Voice message support in regional languages
-- [ ] Document upload for verification
+---
+
+## 🔗 **API Endpoints**
+
+### **Website APIs**
+- `POST /api/webhook` - WhatsApp message processing
+- `GET /api/schemes` - Government schemes data
+- `POST /api/eligibility` - Eligibility checking
+
+### **Bot APIs**
+- Telegram webhook handling
+- Perplexity AI integration
+- Supabase data management
+
+---
+
+## 🌍 **Multilingual Support**
+
+Both platforms support these languages with native scripts:
+
+| Language | Code | Native Script |
+|----------|------|---------------|
+| English | en | English |
+| Hindi | hi | हिन्दी |
+| Bengali | bn | বাংলা |
+| Tamil | ta | தமிழ் |
+| Telugu | te | తెలుగు |
+| Marathi | mr | मराठी |
+| Gujarati | gu | ગુજરાતી |
+| Kannada | kn | ಕನ್ನಡ |
+| Malayalam | ml | മലയാളം |
+| Punjabi | pa | ਪੰਜਾਬੀ |
+| Odia | or | ଓଡ଼ିଆ |
+| Assamese | as | অসমীয়া |
+| Urdu | ur | اردو |
+| Kashmiri | ks | کٲشُر |
+| Maithili | mai | मैथिली |
+
+---
+
+## 🛣️ **Development Roadmap**
+
+### **Phase 1** ✅
+- [x] Multilingual Next.js website
+- [x] WhatsApp integration
+- [x] Telegram bot with Perplexity AI
+- [x] Comprehensive scheme database
+
+### **Phase 2** 🚧
+- [ ] Voice message support
+- [ ] Document upload verification
 - [ ] Application tracking system
-- [ ] SMS fallback for poor internet areas
-- [ ] Regional dialect support (100+ dialects)
+- [ ] Mobile app development
 
-## 🤝 Contributing
+### **Phase 3** 📋
+- [ ] Regional dialect support
+- [ ] Offline functionality
+- [ ] Government API integrations
+- [ ] Advanced analytics dashboard
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+---
 
-## 📄 License
+## 🤝 **Contributing**
 
-MIT License - see LICENSE file for details
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **Commit** your changes: `git commit -m 'Add amazing feature'`
+4. **Push** to branch: `git push origin feature/amazing-feature`
+5. **Open** a Pull Request
+
+### **Development Guidelines**
+- Follow TypeScript best practices
+- Add tests for new features
+- Update documentation
+- Ensure multilingual compatibility
+
+---
+
+## 📄 **License**
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+## 🆘 **Support**
+
+- **Issues**: Create GitHub issues for bugs
+- **Features**: Submit feature requests
+- **Documentation**: Improve this README
+- **Community**: Join our discussions
+
+---
+
+## 🎯 **Project Structure**
+
+```
+├── schemesetu/          # Next.js Website
+│   ├── app/            # App Router pages
+│   ├── components/     # React components
+│   ├── lib/           # Utilities and configs
+│   └── public/        # Static assets & translations
+│
+├── telegram-bot/       # Telegram Bot
+│   ├── bot.js         # Main bot logic
+│   ├── .env           # Bot configuration
+│   └── README.md      # Bot documentation
+│
+└── README.md          # This file
+```
 
 ---
 
 **Built with ❤️ for Indian citizens to easily access government schemes in their native language.**
 
-*"सबका साथ, सबका विकास, सबकी भाषा"* - Together, Development, Everyone's Language# schemesetu
+*"सबका साथ, सबका विकास, सबकी भाषा"* - Together, Development, Everyone's Language
+
+---
+
+### 🏆 **Key Achievements**
+
+- **🌐 15+ Languages**: Complete multilingual support
+- **🤖 Dual Platform**: Website + Telegram bot
+- **🎯 AI-Powered**: Smart eligibility matching
+- **📱 Mobile-First**: Responsive design
+- **🔒 Secure**: Enterprise-grade security
+- **⚡ Fast**: Optimized performance
