@@ -125,5 +125,41 @@
   },
   "common": {
     "appSubtitle": "Government Schemes Assistant"
+  },
+  "botContact": {
+    "badge": "Connect with Our Bots",
+    "title": "Chat with SchemeSaathi Bots",
+    "subtitle": "Choose your preferred platform to start discovering government schemes. Both bots offer the same AI-powered assistance in 15+ Indian languages.",
+    "whatsapp": {
+      "title": "WhatsApp Bot",
+      "description": "Text-based interface with smart greeting detection and multilingual support",
+      "number": "Official WhatsApp Number",
+      "button": "Start WhatsApp Chat",
+      "features": {
+        "textBased": "Text-based menus (1-7)",
+        "greetings": "Smart greeting detection",
+        "multilingual": "15+ Indian languages"
+      }
+    },
+    "telegram": {
+      "title": "Telegram Bot",
+      "description": "Rich interactive experience with buttons, commands, and instant responses",
+      "handle": "Official Telegram Handle",
+      "button": "Start Telegram Chat",
+      "features": {
+        "interactive": "Interactive buttons & keyboards",
+        "commands": "Bot commands (/start, /help)",
+        "richFormatting": "Rich text formatting"
+      }
+    },
+    "common": {
+      "title": "Both Bots Offer",
+      "features": {
+        "languages": "15+ Languages",
+        "aiPowered": "AI-Powered",
+        "instant": "Instant Response",
+        "secure": "Secure & Private"
+      }
+    }
   }
 }
