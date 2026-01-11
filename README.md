@@ -1,14 +1,14 @@
 # SchemeSaathi - AI-Powered Government Schemes Platform 🇮🇳
 
-SchemeSaathi is a comprehensive platform that helps Indian citizens discover government schemes they're eligible for through multiple channels. It features a **multilingual Next.js website** and an **AI-powered Telegram bot** supporting **15+ Indian languages**.
+SchemeSaathi is a comprehensive platform that helps Indian citizens discover government schemes they're eligible for through multiple channels. It features a **multilingual Next.js website** and a **unified AI-powered bot** supporting both **Telegram and WhatsApp** with **15+ Indian languages**.
 
 ## 🌟 Platform Overview
 
 ### 🌐 **Next.js Website** (`/schemesetu`)
-Modern web application with multilingual support and WhatsApp integration
+Modern web application with multilingual support and integrated messaging
 
-### 🤖 **Telegram Bot** (`/telegram-bot`)  
-Standalone AI-powered bot using Perplexity Sonar Pro for intelligent scheme matching
+### 🤖 **Unified Bot** (`/telegram-bot`)  
+**Dual-platform bot** supporting both Telegram and WhatsApp with automatic message synchronization, powered by Perplexity Sonar Pro AI
 
 ---
 
@@ -34,26 +34,49 @@ English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, P
 
 ---
 
-## 🤖 **Telegram Bot Features**
+## 🤖 **Unified Bot Features**
 
-- 🧠 **Perplexity Sonar Pro**: Advanced AI for natural language understanding
-- 📱 **Interactive Keyboards**: Quick action buttons for easy navigation
-- 🎯 **Eligibility-Only Results**: Shows only schemes users can actually apply for
-- 🌐 **Multilingual Support**: 15+ Indian languages with native scripts
-- 📊 **Structured Input**: Simple format - `Age City State Occupation Income`
-- 🔄 **Fallback System**: Works even when AI is unavailable
+### 🔄 **Dual Platform Support**
+- **Telegram Bot**: Full interactive experience with buttons and commands
+- **WhatsApp Bot**: Text-based interface with numbered menus and greeting detection
+- **Automatic Sync**: Messages sync between platforms in real-time
+- **Admin Monitoring**: Designated admin receives all messages from both platforms
 
-### **Bot Commands**
-- `/start` - Welcome message and quick actions
-- `/help` - Usage instructions and examples
-- `/language` - Change preferred language
-- `/schemes` - Browse popular schemes
+### 🧠 **AI-Powered Intelligence**
+- **Perplexity Sonar Pro**: Advanced AI for natural language understanding
+- **15+ Indian Languages**: Complete multilingual support with native scripts
+- **Eligibility-Only Results**: Shows only schemes users can actually apply for
+- **Smart Parsing**: Handles both structured (`25 mumbai Maharashtra farmer 200000`) and natural language
+
+### 📱 **Platform-Specific Features**
+
+#### **Telegram Features**
+- ✅ Interactive buttons and keyboards
+- ✅ Commands (`/start`, `/help`, `/language`, `/schemes`)
+- ✅ Language selection interface
+- ✅ Category-based quick actions (Farmer, Student, Women, Business)
+- ✅ Rich formatting (Markdown)
+
+#### **WhatsApp Features**  
+- ✅ Direct messaging without commands
+- ✅ Same AI engine and scheme database
+- ✅ Multilingual support
+- ✅ QR code authentication
+- ❌ No buttons/commands (WhatsApp limitation)
+
+### 🔄 **Message Synchronization**
+- **Real-time Sync**: Messages automatically appear on both platforms
+- **Bidirectional**: Works from Telegram → WhatsApp and WhatsApp → Telegram
+- **Admin Monitoring**: All user conversations forwarded to admin
+- **Configurable**: Can be enabled/disabled via environment variables
 
 ### **Tech Stack**
 - **Runtime**: Node.js with Telegraf framework
+- **WhatsApp**: whatsapp-web.js with QR authentication
 - **AI**: Perplexity Sonar Pro API
 - **Database**: Supabase (shared with website)
-- **Deployment**: Standalone server
+- **Sync**: Real-time message synchronization
+- **Deployment**: Standalone unified server
 
 ---
 
@@ -81,12 +104,13 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-### **3. Setup Telegram Bot**
+### **3. Setup Unified Bot (Telegram + WhatsApp)**
 ```bash
 cd ../telegram-bot
 npm install
-# Configure .env file
+# Configure .env file with both platform credentials
 npm start
+# Scan WhatsApp QR code when prompted
 ```
 
 ---
@@ -108,7 +132,7 @@ TWILIO_AUTH_TOKEN=your-twilio-token
 TWILIO_WHATSAPP_NUMBER=+14155238886
 ```
 
-### **Telegram Bot** (`.env`)
+### **Unified Bot** (`.env`)
 ```env
 # Telegram
 BOT_TOKEN=your-bot-token-from-botfather
@@ -120,6 +144,11 @@ SUPABASE_ANON_KEY=your-anon-key
 
 # AI
 PERPLEXITY_API_KEY=your-perplexity-api-key
+
+# Message Synchronization
+MESSAGE_SYNC_ENABLED=true
+SYNC_ADMIN_TELEGRAM_ID=your_telegram_user_id
+SYNC_ADMIN_WHATSAPP_NUMBER=your_whatsapp_number
 ```
 
 ---
