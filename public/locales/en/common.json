@@ -32,7 +32,7 @@
       },
       "whatsappIntegration": {
         "title": "WhatsApp Integration",
-        "description": "Seamless messaging experience through Twilio WhatsApp Business API with instant responses"
+        "description": "Client-side redirects to WhatsApp chat for seamless user experience"
       },
       "telegramIntegration": {
         "title": "Telegram Bot Integration",

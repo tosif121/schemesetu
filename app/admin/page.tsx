@@ -1,10 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-import { User } from '../lib/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -18,7 +15,6 @@ import {
   Globe,
   RefreshCw,
   MessageSquare,
-  Phone,
   MapPin,
   Briefcase,
   Languages,
@@ -27,7 +23,6 @@ import {
   CheckCircle,
   BarChart3,
   PieChart,
-  UserCheck,
   Zap,
   Target,
   Bot,
@@ -35,11 +30,8 @@ import {
   ArrowDown,
   Minus,
   Eye,
-  Filter,
-  Download,
   Calendar as CalendarIcon,
   Home,
-  TrendingUp,
   Shield,
   Database,
   Heart,
@@ -81,24 +73,56 @@ const LANGUAGE_NAMES = {
 }
 
 export default function AdminDashboard() {
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { t } = useLanguage()
+  
+  // Mock stats for demonstration - replace with your Node.js backend API calls
   const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeToday: 0,
-    activeThisWeek: 0,
-    activeThisMonth: 0,
-    totalMessages: 0,
-    avgMessagesPerUser: 0,
-    languageBreakdown: {} as Record<string, number>,
-    stateBreakdown: {} as Record<string, number>,
-    occupationBreakdown: {} as Record<string, number>,
-    categoryBreakdown: {} as Record<string, number>,
-    growthRate: 0
+    totalUsers: 1247,
+    activeToday: 89,
+    activeThisWeek: 342,
+    activeThisMonth: 856,
+    totalMessages: 5634,
+    avgMessagesPerUser: 4.5,
+    languageBreakdown: {
+      'hi': 456,
+      'en': 234,
+      'ta': 123,
+      'bn': 98,
+      'te': 87,
+      'mr': 76,
+      'gu': 65,
+      'kn': 54
+    } as Record<string, number>,
+    stateBreakdown: {
+      'Maharashtra': 234,
+      'Tamil Nadu': 187,
+      'Karnataka': 156,
+      'West Bengal': 134,
+      'Gujarat': 123,
+      'Uttar Pradesh': 112,
+      'Rajasthan': 98,
+      'Kerala': 87
+    } as Record<string, number>,
+    occupationBreakdown: {
+      'farmer': 456,
+      'student': 234,
+      'business': 187,
+      'employee': 156,
+      'unemployed': 123,
+      'retired': 91
+    } as Record<string, number>,
+    categoryBreakdown: {
+      'General': 567,
+      'OBC': 234,
+      'SC': 187,
+      'ST': 123,
+      'EWS': 98
+    } as Record<string, number>,
+    growthRate: 12.5
   })
 
   useEffect(() => {
@@ -111,7 +135,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchUsers()
+      refreshData()
     }
   }, [isAuthenticated])
 
@@ -134,98 +158,25 @@ export default function AdminDashboard() {
     return <AdminLogin onLogin={handleLogin} />
   }
 
-  const fetchUsers = async () => {
-    try {
-      if (!supabase) {
-        setError('Supabase client not initialized. Please check your environment variables.')
-        return
-      }
-
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      setUsers(data || [])
-      
-      // Calculate comprehensive stats
-      const totalUsers = data?.length || 0
-      const today = new Date().toISOString().split('T')[0]
-      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-      const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-      
-      const activeToday = data?.filter(user => 
-        user.updated_at?.startsWith(today)
-      ).length || 0
-      
-      const activeThisWeek = data?.filter(user => 
-        user.updated_at && user.updated_at >= weekAgo
-      ).length || 0
-
-      const activeThisMonth = data?.filter(user => 
-        user.updated_at && user.updated_at >= monthAgo
-      ).length || 0
-
-      const totalMessages = data?.reduce((acc, user) => 
-        acc + (user.conversation_history?.length || 0), 0) || 0
-
-      const avgMessagesPerUser = totalUsers > 0 ? Math.round(totalMessages / totalUsers * 10) / 10 : 0
-      
-      const languageBreakdown = data?.reduce((acc, user) => {
-        const lang = user.language_preference || 'unknown'
-        acc[lang] = (acc[lang] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
-
-      const stateBreakdown = data?.reduce((acc, user) => {
-        const state = user.eligibility_data?.state || 'unknown'
-        acc[state] = (acc[state] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
-
-      const occupationBreakdown = data?.reduce((acc, user) => {
-        const occupation = user.eligibility_data?.occupation || 'unknown'
-        acc[occupation] = (acc[occupation] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
-
-      const categoryBreakdown = data?.reduce((acc, user) => {
-        const category = user.eligibility_data?.category || 'unknown'
-        acc[category] = (acc[category] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
-
-      // Calculate growth rate (mock calculation)
-      const growthRate = Math.round(Math.random() * 20 - 5) // -5% to +15%
-
-      setStats({ 
-        totalUsers, 
-        activeToday, 
-        activeThisWeek,
-        activeThisMonth,
-        totalMessages,
-        avgMessagesPerUser,
-        languageBreakdown, 
-        stateBreakdown,
-        occupationBreakdown,
-        categoryBreakdown,
-        growthRate
-      })
-      setError(null)
-    } catch (error) {
-      console.error('Error fetching users:', error)
-      setError(error instanceof Error ? error.message : 'Failed to fetch users')
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }
-
   const refreshData = async () => {
     setRefreshing(true)
-    await fetchUsers()
+    try {
+      // Fetch stats from your Node.js backend API
+      const response = await fetch('/api/admin/stats')
+      const data = await response.json()
+      
+      if (data.success) {
+        setStats(data.data)
+        setError(null)
+      } else {
+        setError(data.error || 'Failed to fetch data')
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+      setError('Failed to connect to backend')
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   if (loading) {
@@ -593,168 +544,96 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* Users Table Section */}
+      {/* Integration Notice */}
       <section className="py-16 md:py-24 bg-white dark:bg-gray-950">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12 md:mb-16">
-            <Badge className="mb-4 bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/50 dark:text-green-300 dark:border-green-800">
-              <UserCheck className="mr-1 h-3 w-3" />
-              User Management
+            <Badge className="mb-4 bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800">
+              <Database className="mr-1 h-3 w-3" />
+              Backend Integration
             </Badge>
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Recent User Activity</h3>
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Connect Your Node.js Backend</h3>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Latest user interactions and profiles ({users.length} total users)
+              This dashboard is ready to connect to your Node.js backend. Update the API calls to fetch real data from your backend services.
             </p>
           </div>
 
-          {/* Users Table */}
-          <Card className="border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <Card className="max-w-4xl mx-auto border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center text-gray-900 dark:text-white">
-                    <UserCheck className="w-5 h-5 mr-2" />
-                    User Database
-                  </CardTitle>
-                  <CardDescription className="text-gray-600 dark:text-gray-400">
-                    Comprehensive user profiles and interaction history
-                  </CardDescription>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
-                  <Button variant="outline" size="sm" className="border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                </div>
-              </div>
+              <CardTitle className="flex items-center text-gray-900 dark:text-white">
+                <Bot className="w-5 h-5 mr-2" />
+                Integration Instructions
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-400">
+                Steps to connect this dashboard to your Node.js backend
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="rounded-md border border-gray-200 dark:border-gray-800">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gray-200 dark:border-gray-800">
-                      <TableHead className="w-[180px] text-gray-700 dark:text-gray-300">
-                        <div className="flex items-center">
-                          <Phone className="w-4 h-4 mr-2" />
-                          Contact / Platform
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-gray-700 dark:text-gray-300">
-                        <div className="flex items-center">
-                          <Languages className="w-4 h-4 mr-2" />
-                          Language
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-gray-700 dark:text-gray-300">
-                        <div className="flex items-center">
-                          <Users className="w-4 h-4 mr-2" />
-                          Profile
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-center text-gray-700 dark:text-gray-300">
-                        <div className="flex items-center justify-center">
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Messages
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-gray-700 dark:text-gray-300">
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2" />
-                          Last Active
-                        </div>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.slice(0, 50).map((user) => (
-                      <TableRow key={user.phone || user.telegram_id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 border-gray-200 dark:border-gray-800">
-                        <TableCell className="font-mono text-sm text-gray-900 dark:text-white">
-                          {user.phone ? 
-                            user.phone.replace(/(\d{2})(\d{5})(\d{5})/, '+91 $1 $2 $3') : 
-                            `@${user.telegram_id} (Telegram)`
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {user.language_preference ? (
-                            <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                              {LANGUAGE_NAMES[user.language_preference as keyof typeof LANGUAGE_NAMES] || user.language_preference}
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-700">
-                              Not set
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {user.eligibility_data ? (
-                            <div className="space-y-1">
-                              <div className="flex flex-wrap gap-1">
-                                {user.eligibility_data.age && (
-                                  <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-700">
-                                    Age: {user.eligibility_data.age}
-                                  </Badge>
-                                )}
-                                {user.eligibility_data.state && (
-                                  <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-700">
-                                    {user.eligibility_data.state}
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                {user.eligibility_data.occupation && (
-                                  <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                                    {user.eligibility_data.occupation}
-                                  </Badge>
-                                )}
-                                {user.eligibility_data.category && (
-                                  <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-700">
-                                    {user.eligibility_data.category}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-gray-500 dark:text-gray-400 text-sm">No profile data</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="outline" className="text-xs border-gray-300 dark:border-gray-700">
-                            {user.conversation_history?.length || 0}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm text-gray-500 dark:text-gray-400">
-                          {user.updated_at ? (
-                            <div className="flex items-center">
-                              <Clock className="w-3 h-3 mr-1" />
-                              {new Date(user.updated_at).toLocaleDateString('en-IN', {
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </div>
-                          ) : (
-                            'Never'
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              {users.length === 0 && (
-                <div className="text-center py-12">
-                  <Users className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">No users yet</h3>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
-                    Users will appear here once they start interacting with SchemeSaathi
-                  </p>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                    Frontend (Completed)
+                  </h4>
+                  <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                    <li>• Removed Supabase dependencies</li>
+                    <li>• Removed Gemini AI integration</li>
+                    <li>• Removed Twilio WhatsApp API</li>
+                    <li>• Cleaned up unused API routes</li>
+                    <li>• Client-side WhatsApp redirects only</li>
+                  </ul>
                 </div>
-              )}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-900 dark:text-white flex items-center">
+                    <Clock className="w-4 h-4 mr-2 text-blue-500" />
+                    Backend (Your Node.js)
+                  </h4>
+                  <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                    <li>• Update refreshData() function</li>
+                    <li>• Add API endpoints for stats</li>
+                    <li>• Connect to your database</li>
+                    <li>• Implement user management</li>
+                    <li>• Add authentication middleware</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 dark:text-white mb-2">Quick Actions:</h5>
+                <div className="space-y-2">
+                  <Link href="/admin/users">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Users className="w-4 h-4 mr-2" />
+                      View All Users
+                    </Button>
+                  </Link>
+                  <Link href="/admin/schemes">
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Database className="w-4 h-4 mr-2" />
+                      Manage Schemes
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 dark:text-white mb-2">API Integration Example:</h5>
+                <pre className="text-xs text-gray-600 dark:text-gray-400 overflow-x-auto">
+{`// Replace refreshData() function with:
+const refreshData = async () => {
+  setRefreshing(true)
+  try {
+    const response = await fetch('/api/admin/stats')
+    const data = await response.json()
+    setStats(data)
+  } catch (error) {
+    setError('Failed to fetch data')
+  } finally {
+    setRefreshing(false)
+  }
+}`}
+                </pre>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -787,15 +666,15 @@ export default function AdminDashboard() {
               <ul className="space-y-2 text-gray-400 dark:text-gray-500">
                 <li className="flex items-center">
                   <CheckCircle className="w-3 h-3 mr-2 text-green-400" />
-                  Database: Operational
+                  Frontend: Operational
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-400" />
-                  WhatsApp API: Connected
+                  <Clock className="w-3 h-3 mr-2 text-blue-400" />
+                  Backend: Connect Node.js
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-400" />
-                  Gemini AI: Active
+                  <AlertCircle className="w-3 h-3 mr-2 text-yellow-400" />
+                  WhatsApp: Client-side redirects
                 </li>
                 <li className="flex items-center">
                   <Clock className="w-3 h-3 mr-2 text-blue-400" />
@@ -846,7 +725,7 @@ export default function AdminDashboard() {
               <Separator orientation="vertical" className="h-4 bg-gray-700" />
               <div className="flex items-center space-x-2">
                 <Zap className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm">Powered by Supabase & Gemini AI</span>
+                <span className="text-sm">Ready for Node.js Backend</span>
               </div>
             </div>
           </div>
