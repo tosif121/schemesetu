@@ -18,7 +18,6 @@ SchemeSaathi is a comprehensive platform that helps Indian citizens discover gov
 ## 🔗 **Live Links**
 
 - **🌐 Website**: https://scheme-setu-govt.vercel.app/
-- **👨‍💼 Admin Dashboard**: https://scheme-setu-govt.vercel.app/admin (admin/scheme123)
 - **📱 Telegram Bot**: https://t.me/schemesetu_bot
 - **💬 WhatsApp Bot**: +91 78500 06956
 - **📂 GitHub Repository**: https://github.com/tosif121/schemesetu.git
@@ -26,25 +25,15 @@ SchemeSaathi is a comprehensive platform that helps Indian citizens discover gov
 ## ✅ **What's Currently Working**
 
 ### **Frontend (Next.js) - Fully Integrated with Supabase**
-- ✅ **Admin Login**: Working with credentials (admin/scheme123)
-- ✅ **Admin Dashboard**: Real-time stats from Supabase database
-- ✅ **User Management**: Complete CRUD interface at `/admin/users` with live data
-- ✅ **Scheme Management**: Complete CRUD interface at `/admin/schemes` with live data
-- ✅ **Database Seeding**: One-click initial data population for new installations
 - ✅ **Multilingual Support**: 15+ Indian languages with complete translations
 - ✅ **WhatsApp Integration**: Client-side redirects to WhatsApp chat
 - ✅ **Telegram Integration**: Client-side redirects to Telegram bot
 - ✅ **Responsive Design**: Mobile-first design with dark/light themes
-- ✅ **Real-time Analytics**: Live user engagement and scheme interaction tracking
+- ✅ **Database Integration**: Connected to Supabase for data storage
 
 ### **API Routes (Supabase Integrated)**
-- ✅ **GET /api/admin/stats**: Live dashboard statistics from Supabase
-- ✅ **GET /api/admin/users**: User management with platform filtering from Supabase
-- ✅ **POST /api/admin/users**: Create new users in Supabase
-- ✅ **GET /api/admin/schemes**: Scheme management with CRUD operations from Supabase
-- ✅ **POST /api/admin/schemes**: Create new schemes in Supabase
-- ✅ **PUT /api/admin/schemes**: Update existing schemes in Supabase
-- ✅ **POST /api/admin/seed**: Populate database with initial government schemes
+- ✅ Backend API routes connected to Supabase database
+- ✅ Real-time data synchronization
 
 ### **Database Schema (Live in Supabase)**
 - ✅ **Complete Schema**: All tables live in Supabase (users, schemes, conversations, analytics, user_schemes)
@@ -62,32 +51,6 @@ SchemeSaathi is a comprehensive platform that helps Indian citizens discover gov
 - ✅ **Live Database**: Bot reads schemes directly from Supabase
 - ✅ **User Tracking**: All user interactions logged to Supabase
 - ✅ **Scheme Analytics**: Real-time tracking of scheme views and applications
-
-## 📊 **Admin Dashboard Features**
-
-### **Main Dashboard** (`/admin`)
-- User statistics (total, active, growth rate)
-- Language distribution analytics
-- Geographic distribution by state
-- Occupation-based insights
-- Platform usage (WhatsApp vs Telegram)
-- Real-time refresh functionality
-
-### **User Management** (`/admin/users`)
-- Complete user listing with pagination
-- Platform filtering (WhatsApp/Telegram/All)
-- User profile details and eligibility data
-- Conversation history tracking
-- Export functionality (ready for implementation)
-- Search functionality (ready for implementation)
-
-### **Scheme Management** (`/admin/schemes`)
-- Complete scheme listing with category filtering
-- Scheme details with interaction analytics
-- Department and coverage information
-- Status tracking (active/inactive)
-- CRUD operations (create, read, update, delete)
-- Export and search functionality (ready for implementation)
 
 ## 🤖 **Bot Capabilities**
 
@@ -117,21 +80,9 @@ SchemeSaathi is a comprehensive platform that helps Indian citizens discover gov
 The project is already connected to Supabase with:
 - Complete database schema deployed
 - All API routes integrated with Supabase
-- Fallback to mock data if Supabase is unavailable
 - Real-time data from your existing Supabase instance
 
-### **2. Authentication Enhancement**
-The admin system currently uses localStorage. For production:
-
-```javascript
-// Update admin credentials in app/admin/page.tsx
-const ADMIN_CREDENTIALS = {
-  username: 'your_admin_username',
-  password: 'your_secure_password'
-}
-```
-
-### **3. myScheme API Integration**
+### **2. myScheme API Integration**
 Update the bot to use real myScheme APIs:
 
 ```javascript
@@ -533,12 +484,7 @@ The bot includes comprehensive government schemes:
 schemesetu/
 ├── app/                    # Next.js App Router pages
 │   ├── Context/           # Language context
-│   ├── admin/             # Admin dashboard
-│   │   ├── page.tsx      # Main dashboard
-│   │   ├── users/        # User management
-│   │   └── schemes/      # Scheme management
-│   └── api/               # API routes
-│       └── admin/        # Admin API endpoints
+│   └── api/               # API routes (if any)
 ├── components/            # React components
 ├── lib/                   # Utilities and configs
 ├── public/                # Static assets & translations
@@ -547,6 +493,7 @@ schemesetu/
 │   ├── unified-bot.js    # Main unified bot
 │   ├── bot.js            # Telegram-only bot (legacy)
 │   ├── complete-schema.sql # Database schema
+│   ├── Dockerfile        # Docker configuration for Railway
 │   ├── package.json      # Bot dependencies
 │   └── .env              # Bot configuration
 └── README.md             # This comprehensive guide
@@ -555,12 +502,11 @@ schemesetu/
 ## 🚀 **Next Steps for Production**
 
 1. **✅ Database Connected**: Supabase is already integrated and working
-2. **Deploy Bot**: Set up Node.js server for the unified bot
+2. **Deploy Bot**: Set up Node.js server for the unified bot (Railway recommended)
 3. **Integrate myScheme APIs**: Connect to official government APIs
-4. **Enhance Authentication**: Add proper admin authentication system
-5. **Add Voice Support**: Implement voice message processing
-6. **Analytics Enhancement**: Add more detailed user journey tracking
-7. **Performance Optimization**: Implement caching and rate limiting
+4. **Add Voice Support**: Implement voice message processing
+5. **Analytics Enhancement**: Add more detailed user journey tracking
+6. **Performance Optimization**: Implement caching and rate limiting
 
 ## 📈 **Social Impact Metrics**
 
@@ -627,7 +573,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **🤖 Dual Platform**: Website + Telegram + WhatsApp bot
 - **🎯 AI-Powered**: Smart eligibility matching
 - **📱 Mobile-First**: Responsive design
-- **👨‍💼 Admin Dashboard**: Complete management interface
+- **🗄️ Database**: Supabase integration
 - **🔒 Secure**: Enterprise-grade security
 - **⚡ Fast**: Optimized performance
 
