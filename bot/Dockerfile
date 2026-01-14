@@ -1,7 +1,7 @@
 # Use Node.js 18 with Debian (required for Chrome)
 FROM node:18-bullseye
 
-# Install Chrome dependencies
+# Install Chrome dependencies and required libraries
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -27,6 +27,22 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     libu2f-udev \
     libvulkan1 \
+    libglib2.0-0 \
+    libgconf-2-4 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxi6 \
+    libxtst6 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libcairo-gobject2 \
+    libgdk-pixbuf2.0-0 \
+    libjpeg62-turbo \
+    libpng16-16 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Google Chrome
