@@ -119,10 +119,10 @@ export const WhatsAppMessages = {
   // Start general conversation
   startChat: (language: string = 'en') => {
     const messages = {
-      en: "👋 Hello! I need help with government schemes",
-      hi: "👋 नमस्ते! मुझे सरकारी योजनाओं में मदद चाहिए",
-      ta: "👋 வணக்கம்! எனக்கு அரசு திட்டங்களில் உதவி தேவை",
-      bn: "👋 নমস্কার! আমার সরকারি প্রকল্পে সাহায্য দরকার"
+      en: "hi",
+      hi: "hi",
+      ta: "hi",
+      bn: "hi"
     }
     return generateWhatsAppURL(messages[language as keyof typeof messages] || messages.en, language)
   },
