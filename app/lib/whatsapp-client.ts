@@ -1,7 +1,7 @@
 // WhatsApp client-side utilities for redirecting users to WhatsApp chat
 
 // WhatsApp Business number from environment
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+14482421772'
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+917850006956'
 
 // Welcome messages in different languages
 const WELCOME_MESSAGES = {
