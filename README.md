@@ -456,9 +456,9 @@ Both platforms support these languages with native scripts:
 
 ## 🚀 **Deployment**
 
-### **Next.js Website**
+### **Next.js Website (Vercel)**
 ```bash
-# Vercel deployment
+# Vercel deployment (recommended)
 vercel --prod
 
 # Or build locally
@@ -466,9 +466,32 @@ npm run build
 npm start
 ```
 
-### **Unified Bot**
+**Live**: https://scheme-setu-govt.vercel.app/
+
+### **Unified Bot (Railway.app - Recommended)**
+
+Railway supports Docker with Chrome, perfect for both Telegram + WhatsApp bots.
+
+**Quick Deploy:**
+1. Push code to GitHub
+2. Go to [railway.app](https://railway.app)
+3. Create new project from GitHub repo
+4. Select `bot` directory
+5. Add environment variables
+6. Deploy!
+
+**Detailed guide**: See [bot/RAILWAY_DEPLOYMENT.md](bot/RAILWAY_DEPLOYMENT.md)
+
+**Why Railway?**
+- ✅ Supports Chrome/Chromium (required for WhatsApp)
+- ✅ Docker support out of the box
+- ✅ Auto-deploys on git push
+- ✅ Persistent volumes for WhatsApp sessions
+- ✅ $5/month (first $5 free)
+
+### **Alternative: VPS Deployment**
 ```bash
-# PM2 (recommended)
+# PM2 (for VPS/DigitalOcean/AWS)
 npm install -g pm2
 cd bot
 pm2 start unified-bot.js --name "schemesaathi-unified"
@@ -478,6 +501,16 @@ pm2 save
 # Or direct
 npm start
 ```
+
+### **Telegram-Only (Render.com)**
+
+If you only need Telegram (no WhatsApp):
+```bash
+# Use bot.js instead of unified-bot.js
+npm run telegram-only
+```
+
+Render works great for Telegram-only bots (no Chrome needed).
 
 ## 🎯 **Government Schemes**
 
