@@ -176,34 +176,83 @@ npm start
 
 ## ⚙️ **Environment Configuration**
 
-### **Next.js Website** (`.env.local`)
-```env
-# Supabase Configuration (Already configured!)
-NEXT_PUBLIC_SUPABASE_URL=https://mbogyemohzmhdvbsdvwo.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+### **Setup Instructions**
 
-# WhatsApp - Public WhatsApp number for client-side redirects
-NEXT_PUBLIC_WHATSAPP_NUMBER=+917850006956
+1. **Copy the example environment files:**
+```bash
+# For Next.js frontend
+cp .env.example .env.local
+
+# For bot
+cp bot/.env.example bot/.env
 ```
 
-### **Unified Bot** (`bot/.env`)
+2. **Configure your environment variables** (see below for details)
+
+### **Next.js Website** (`.env.local`)
+
+Copy `.env.example` to `.env.local` and configure:
+
 ```env
-# Telegram Bot
+# Supabase Configuration
+# Get these from: https://supabase.com/dashboard/project/_/settings/api
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# WhatsApp Configuration
+# Public WhatsApp number for client-side redirects (format: +1234567890)
+NEXT_PUBLIC_WHATSAPP_NUMBER=+1234567890
+```
+
+**How to get Supabase credentials:**
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to Settings → API
+4. Copy the `Project URL` and `anon/public` key
+
+### **Unified Bot** (`bot/.env`)
+
+Copy `bot/.env.example` to `bot/.env` and configure:
+
+```env
+# Telegram Bot Configuration
+# Get your bot token from @BotFather on Telegram
 BOT_TOKEN=your_telegram_bot_token
 BOT_USERNAME=your_bot_username
 
-# Supabase Configuration (Same as frontend)
-SUPABASE_URL=https://mbogyemohzmhdvbsdvwo.supabase.co
+# Supabase Configuration
+# Must match the frontend configuration
+SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Perplexity AI
+# Perplexity AI Configuration
+# Get API key from: https://www.perplexity.ai/settings/api
 PERPLEXITY_API_KEY=your_perplexity_api_key
 
-# Message Synchronization
-MESSAGE_SYNC_ENABLED=true
+# Bot Configuration
+NODE_ENV=development
+
+# Message Synchronization Configuration (Optional)
+# Enable to sync messages between Telegram and WhatsApp
+MESSAGE_SYNC_ENABLED=false
 SYNC_ADMIN_TELEGRAM_ID=your_telegram_user_id
 SYNC_ADMIN_WHATSAPP_NUMBER=your_whatsapp_number
 ```
+
+**How to get bot credentials:**
+1. **Telegram Bot Token**: 
+   - Open Telegram and search for `@BotFather`
+   - Send `/newbot` and follow instructions
+   - Copy the bot token provided
+
+2. **Perplexity API Key**:
+   - Go to [Perplexity Settings](https://www.perplexity.ai/settings/api)
+   - Generate a new API key
+   - Copy the key
+
+3. **Message Sync** (Optional):
+   - Get your Telegram user ID from `@userinfobot`
+   - Use your WhatsApp number with country code
 
 ## 🗄️ **Database Setup**
 
