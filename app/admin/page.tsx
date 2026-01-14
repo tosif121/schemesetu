@@ -77,6 +77,8 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [seeding, setSeeding] = useState(false)
+  const [seedStatus, setSeedStatus] = useState<any>(null)
   const { t } = useLanguage()
   
   // Mock stats for demonstration - replace with your Node.js backend API calls
@@ -136,8 +138,42 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (isAuthenticated) {
       refreshData()
+      checkSeedStatus()
     }
   }, [isAuthenticated])
+
+  const checkSeedStatus = async () => {
+    try {
+      const response = await fetch('/api/admin/seed')
+      const data = await response.json()
+      if (data.success) {
+        setSeedStatus(data.data)
+      }
+    } catch (error) {
+      console.error('Error checking seed status:', error)
+    }
+  }
+
+  const handleSeedDatabase = async () => {
+    setSeeding(true)
+    try {
+      const response = await fetch('/api/admin/seed', { method: 'POST' })
+      const data = await response.json()
+      
+      if (data.success) {
+        alert(`✅ ${data.message}`)
+        await refreshData()
+        await checkSeedStatus()
+      } else {
+        alert(`❌ ${data.message || 'Failed to seed database'}`)
+      }
+    } catch (error) {
+      console.error('Error seeding database:', error)
+      alert('❌ Failed to seed database')
+    } finally {
+      setSeeding(false)
+    }
+  }
 
   const handleLogin = (username: string, password: string): boolean => {
     if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
@@ -599,18 +635,28 @@ export default function AdminDashboard() {
               </div>
               
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 dark:text-white mb-2">Quick Actions:</h5>
+                <h5 className="font-medium text-gray-900 dark:text-white mb-2">Database Management:</h5>
                 <div className="space-y-2">
+                  {seedStatus && !seedStatus.isSeeded && (
+                    <Button 
+                      onClick={handleSeedDatabase}
+                      disabled={seeding}
+                      className="w-full justify-start bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Database className="w-4 h-4 mr-2" />
+                      {seeding ? 'Seeding Database...' : 'Seed Initial Schemes'}
+                    </Button>
+                  )}
                   <Link href="/admin/users">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Users className="w-4 h-4 mr-2" />
-                      View All Users
+                      View All Users ({seedStatus?.users || 0})
                     </Button>
                   </Link>
                   <Link href="/admin/schemes">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Database className="w-4 h-4 mr-2" />
-                      Manage Schemes
+                      Manage Schemes ({seedStatus?.schemes || 0})
                     </Button>
                   </Link>
                 </div>

@@ -3,6 +3,15 @@ const { Client, LocalAuth, MessageMedia, Buttons, List } = require('whatsapp-web
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
+const { 
+  getAllSchemes, 
+  getSchemesByCategory, 
+  filterSchemes, 
+  getSchemesByOccupation, 
+  getSchemesByGender,
+  logSchemeInteraction,
+  logConversation
+} = require('./supabase-schemes');
 require('dotenv').config();
 
 // Initialize services
@@ -503,130 +512,9 @@ Response:`;
   }
 }
 
-// Mock schemes data - only eligible schemes will be returned
-const MOCK_SCHEMES = [
-  {
-    id: 'pm-kisan',
-    name: 'PM-KISAN',
-    description: 'Direct income support to farmers',
-    benefits: '₹6,000 per year in 3 installments',
-    eligibility: { occupation: ['farmer'], landOwnership: true },
-    url: 'https://pmkisan.gov.in/',
-  },
-  {
-    id: 'ayushman-bharat',
-    name: 'Ayushman Bharat PM-JAY',
-    description: 'Health insurance for economically vulnerable families',
-    benefits: '₹5 lakh per family per year health coverage',
-    eligibility: { income_max: 500000, category: ['BPL'] },
-    url: 'https://pmjay.gov.in/',
-  },
-  {
-    id: 'mudra-loan',
-    name: 'Pradhan Mantri MUDRA Yojana',
-    description: 'Micro finance for small businesses',
-    benefits: 'Loans up to ₹10 lakh without collateral',
-    eligibility: { occupation: ['business', 'entrepreneur'], age_min: 18, age_max: 65 },
-    url: 'https://mudra.org.in/',
-  },
-  {
-    id: 'beti-bachao',
-    name: 'Beti Bachao Beti Padhao',
-    description: 'Girl child education and empowerment scheme',
-    benefits: 'Financial support for girl child education and safety',
-    eligibility: { gender: 'female', age_max: 18 },
-    url: 'https://wcd.nic.in/bbbp-scheme',
-  },
-  {
-    id: 'national-scholarship',
-    name: 'National Scholarship Portal',
-    description: 'Financial assistance for students',
-    benefits: 'Scholarships up to ₹2 lakh per year',
-    eligibility: { occupation: ['student'], age_min: 16, age_max: 25, income_max: 800000 },
-    url: 'https://scholarships.gov.in/',
-  },
-  {
-    id: 'kisan-credit-card',
-    name: 'Kisan Credit Card',
-    description: 'Credit facility for farmers',
-    benefits: 'Easy credit access for agricultural needs',
-    eligibility: { occupation: ['farmer'] },
-    url: 'https://pmkisan.gov.in/KCCStaticReport.aspx',
-  },
-  {
-    id: 'stand-up-india',
-    name: 'Stand Up India',
-    description: 'Bank loans for SC/ST and women entrepreneurs',
-    benefits: 'Loans between ₹10 lakh to ₹1 crore',
-    eligibility: { occupation: ['business', 'entrepreneur'], gender: 'female' },
-    url: 'https://standupmitra.in/',
-  },
-  {
-    id: 'sukanya-samriddhi',
-    name: 'Sukanya Samriddhi Yojana',
-    description: 'Savings scheme for girl child',
-    benefits: 'High interest savings for girl child education and marriage',
-    eligibility: { gender: 'female', age_max: 10 },
-    url: 'https://www.nsiindia.gov.in/InternalPage.aspx?Id_Pk=61',
-  },
-];
+// Schemes are now loaded from Supabase via supabase-schemes.js
 
-// Strict eligibility filtering - only return schemes user is actually eligible for
-function filterSchemes(eligibility) {
-  return MOCK_SCHEMES.filter(scheme => {
-    // Check occupation match (strict)
-    if (eligibility.occupation && scheme.eligibility.occupation) {
-      const userOccupation = eligibility.occupation.toLowerCase();
-      const schemeOccupations = scheme.eligibility.occupation.map(occ => occ.toLowerCase());
-      
-      const occupationMatch = schemeOccupations.some(occ => 
-        userOccupation.includes(occ) || occ.includes(userOccupation)
-      );
-      
-      if (!occupationMatch) {
-        return false; // Exclude if occupation doesn't match
-      }
-    }
-
-    // Check income eligibility (strict - must be within limit)
-    if (eligibility.income && scheme.eligibility.income_max) {
-      if (eligibility.income > scheme.eligibility.income_max) {
-        return false; // Exclude if income exceeds limit
-      }
-    }
-
-    // Check age eligibility (strict - must be within range)
-    if (eligibility.age && (scheme.eligibility.age_min || scheme.eligibility.age_max)) {
-      const ageMatch = (!scheme.eligibility.age_min || eligibility.age >= scheme.eligibility.age_min) &&
-                      (!scheme.eligibility.age_max || eligibility.age <= scheme.eligibility.age_max);
-      if (!ageMatch) {
-        return false; // Exclude if age is outside range
-      }
-    }
-
-    // Check gender eligibility (strict)
-    if (eligibility.gender && scheme.eligibility.gender) {
-      if (eligibility.gender !== scheme.eligibility.gender) {
-        return false; // Exclude if gender doesn't match
-      }
-    }
-
-    // Check category eligibility (strict)
-    if (eligibility.category && scheme.eligibility.category) {
-      if (!scheme.eligibility.category.includes(eligibility.category)) {
-        return false; // Exclude if category doesn't match
-      }
-    }
-
-    // If no specific user criteria provided, show popular schemes
-    const hasUserData = eligibility.age || eligibility.occupation || eligibility.income || eligibility.gender || eligibility.category;
-    if (!hasUserData) {
-      return ['pm-kisan', 'ayushman-bharat', 'mudra-loan'].includes(scheme.id);
-    }
-
-    return true; // Include if all checks passed
-  });
-}
+// filterSchemes function is now imported from supabase-schemes.js
 
 // Fallback response for when AI is not available
 function generateFallbackResponse(eligibility, schemes, language = 'en') {
@@ -673,16 +561,33 @@ async function processMessage(messageText, identifier, firstName, username, plat
     const user = await getOrCreateUser(identifier, firstName, username, platform);
     const userLanguage = user?.language_preference || 'en';
     
+    // Log the conversation
+    if (user) {
+      await logConversation(user.id, platform, 'user_message', messageText);
+    }
+    
     // Extract eligibility from user message
     const eligibility = await extractEligibility(messageText);
     console.log('Extracted eligibility:', eligibility);
     
-    // Filter schemes based on eligibility
-    const matchingSchemes = filterSchemes(eligibility);
-    console.log(`Found ${matchingSchemes.length} matching schemes`);
+    // Filter schemes based on eligibility using Supabase
+    const matchingSchemes = await filterSchemes(eligibility);
+    console.log(`Found ${matchingSchemes.length} matching schemes from Supabase`);
+    
+    // Log scheme interactions
+    if (user && matchingSchemes.length > 0) {
+      for (const scheme of matchingSchemes) {
+        await logSchemeInteraction(user.id, scheme.id, 'viewed', platform);
+      }
+    }
     
     // Generate response
     const response = await generateResponse(eligibility, matchingSchemes, userLanguage);
+    
+    // Log bot response
+    if (user) {
+      await logConversation(user.id, platform, 'bot_response', response);
+    }
     
     return response;
   } catch (error) {
@@ -923,44 +828,35 @@ async function handleWhatsAppButtonClick(buttonId, contact, message, userLanguag
   
   switch (buttonId) {
     case 'find_schemes':
-      schemes = MOCK_SCHEMES;
+      schemes = await getAllSchemes();
       response = userLanguage === 'hi' 
         ? '🔍 सभी उपलब्ध सरकारी योजनाएं:\n\nव्यक्तिगत सुझाव के लिए अपना विवरण भेजें: उम्र शहर राज्य व्यवसाय आय\n\n'
         : '🔍 All Available Government Schemes:\n\nFor personalized recommendations, send your details: Age City State Occupation Income\n\n';
       break;
       
     case 'farmer_schemes':
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && scheme.eligibility.occupation.includes('farmer')
-      );
+      schemes = await getSchemesByOccupation('farmer');
       response = userLanguage === 'hi' 
         ? '🌾 किसानों के लिए सरकारी योजनाएं:\n\n'
         : '🌾 Government Schemes for Farmers:\n\n';
       break;
       
     case 'student_schemes':
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && scheme.eligibility.occupation.includes('student')
-      );
+      schemes = await getSchemesByOccupation('student');
       response = userLanguage === 'hi' 
         ? '🎓 छात्रों के लिए सरकारी योजनाएं:\n\n'
         : '🎓 Government Schemes for Students:\n\n';
       break;
       
     case 'women_schemes':
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.gender === 'female'
-      );
+      schemes = await getSchemesByGender('female');
       response = userLanguage === 'hi' 
         ? '👩 महिलाओं के लिए सरकारी योजनाएं:\n\n'
         : '👩 Government Schemes for Women:\n\n';
       break;
       
     case 'business_schemes':
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && 
-        (scheme.eligibility.occupation.includes('business') || scheme.eligibility.occupation.includes('entrepreneur'))
-      );
+      schemes = await getSchemesByOccupation('business');
       response = userLanguage === 'hi' 
         ? '💼 व्यापार और स्टार्टअप योजनाएं:\n\n'
         : '💼 Business and Startup Schemes:\n\n';
@@ -1019,44 +915,35 @@ async function handleWhatsAppMenuSelection(selection, contact, message, userLang
   
   switch (selection) {
     case '1': // Find Schemes
-      schemes = MOCK_SCHEMES;
+      schemes = await getAllSchemes();
       response = userLanguage === 'hi' 
         ? '🔍 सभी उपलब्ध सरकारी योजनाएं:\n\nव्यक्तिगत सुझाव के लिए अपना विवरण भेजें: उम्र शहर राज्य व्यवसाय आय\n\n'
         : '🔍 All Available Government Schemes:\n\nFor personalized recommendations, send your details: Age City State Occupation Income\n\n';
       break;
       
     case '2': // Farmer Schemes
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && scheme.eligibility.occupation.includes('farmer')
-      );
+      schemes = await getSchemesByOccupation('farmer');
       response = userLanguage === 'hi' 
         ? '🌾 किसानों के लिए सरकारी योजनाएं:\n\n'
         : '🌾 Government Schemes for Farmers:\n\n';
       break;
       
     case '3': // Student Schemes
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && scheme.eligibility.occupation.includes('student')
-      );
+      schemes = await getSchemesByOccupation('student');
       response = userLanguage === 'hi' 
         ? '🎓 छात्रों के लिए सरकारी योजनाएं:\n\n'
         : '🎓 Government Schemes for Students:\n\n';
       break;
       
     case '4': // Women Schemes
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.gender === 'female'
-      );
+      schemes = await getSchemesByGender('female');
       response = userLanguage === 'hi' 
         ? '👩 महिलाओं के लिए सरकारी योजनाएं:\n\n'
         : '👩 Government Schemes for Women:\n\n';
       break;
       
     case '5': // Business Schemes
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && 
-        (scheme.eligibility.occupation.includes('business') || scheme.eligibility.occupation.includes('entrepreneur'))
-      );
+      schemes = await getSchemesByOccupation('business');
       response = userLanguage === 'hi' 
         ? '💼 व्यापार और स्टार्टअप योजनाएं:\n\n'
         : '💼 Business and Startup Schemes:\n\n';
@@ -1565,46 +1452,37 @@ telegramBot.on('callback_query', async (ctx) => {
     );
     
   } else if (data.startsWith('action_')) {
-    // Handle quick action buttons with direct scheme filtering
+    // Handle quick action buttons with direct scheme filtering using Supabase
     let schemes = [];
     let responseMessage = '';
     
     if (data === 'action_farmer') {
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && scheme.eligibility.occupation.includes('farmer')
-      );
+      schemes = await getSchemesByOccupation('farmer');
       responseMessage = userLanguage === 'hi' 
         ? '🌾 किसानों के लिए सरकारी योजनाएं:' 
         : '🌾 Government Schemes for Farmers:';
         
     } else if (data === 'action_student') {
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && scheme.eligibility.occupation.includes('student')
-      );
+      schemes = await getSchemesByOccupation('student');
       responseMessage = userLanguage === 'hi' 
         ? '🎓 छात्रों के लिए सरकारी योजनाएं:' 
         : '🎓 Government Schemes for Students:';
         
     } else if (data === 'action_women') {
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.gender === 'female'
-      );
+      schemes = await getSchemesByGender('female');
       responseMessage = userLanguage === 'hi' 
         ? '👩 महिलाओं के लिए सरकारी योजनाएं:' 
         : '👩 Government Schemes for Women:';
         
     } else if (data === 'action_business') {
-      schemes = MOCK_SCHEMES.filter(scheme => 
-        scheme.eligibility.occupation && 
-        (scheme.eligibility.occupation.includes('business') || scheme.eligibility.occupation.includes('entrepreneur'))
-      );
+      schemes = await getSchemesByOccupation('business');
       responseMessage = userLanguage === 'hi' 
         ? '💼 व्यापार और स्टार्टअप योजनाएं:' 
         : '💼 Business and Startup Schemes:';
         
     } else if (data === 'action_find_schemes' || data === 'action_check_eligibility') {
-      // For general actions, show all available schemes
-      schemes = MOCK_SCHEMES; // Show all schemes
+      // For general actions, show all available schemes from Supabase
+      schemes = await getAllSchemes();
       responseMessage = userLanguage === 'hi' 
         ? '🔍 सभी उपलब्ध सरकारी योजनाएं:\n\nव्यक्तिगत सुझाव के लिए अपना विवरण भेजें: उम्र शहर राज्य व्यवसाय आय' 
         : '🔍 All Available Government Schemes:\n\nFor personalized recommendations, send your details: Age City State Occupation Income';
