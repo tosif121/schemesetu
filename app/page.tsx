@@ -35,24 +35,16 @@ import {
   TrendingUp,
   Clock,
   MapPin,
-  LogOut,
   Menu,
   X,
 } from 'lucide-react';
 
 export default function HomePage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const whatsapp = useWhatsApp();
   const telegram = useTelegram();
   const { t } = useLanguage();
-
-  useEffect(() => {
-    // Check if user is authenticated
-    const authStatus = localStorage.getItem('admin_authenticated');
-    setIsAuthenticated(authStatus === 'true');
-  }, []);
 
   useEffect(() => {
     // Handle scroll event
@@ -64,11 +56,6 @@ export default function HomePage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('admin_authenticated');
-    setIsAuthenticated(false);
-  };
 
   // Navigation items array
   const navItems = [
@@ -279,47 +266,6 @@ export default function HomePage() {
                 {item.label}
               </Link>
             ))}
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-2">
-                <Link href="/admin">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className={`transition-all duration-300 ${
-                      isScrolled
-                        ? 'border-gray-300 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800'
-                        : 'border-white text-white hover:bg-white hover:text-gray-900 backdrop-blur-sm bg-white/10'
-                    }`}
-                  >
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    {t('nav.dashboard')}
-                  </Button>
-                </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-950/30"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  {t('nav.logout')}
-                </Button>
-              </div>
-            ) : (
-              <Link href="/admin">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`transition-all duration-300 ${
-                    isScrolled
-                      ? 'border-gray-300 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800'
-                      : 'border-white text-white hover:bg-white hover:text-gray-900 backdrop-blur-sm bg-white/10'
-                  }`}
-                >
-                  {t('nav.login')}
-                </Button>
-              </Link>
-            )}
             <LanguageSelector isScrolled={isScrolled} />
             <ThemeToggle />
           </nav>
@@ -411,42 +357,6 @@ export default function HomePage() {
                       <ThemeToggle />
                     </div>
                   </div>
-                </div>
-
-                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-                  {isAuthenticated ? (
-                    <div className="space-y-3">
-                      <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left border-gray-300 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
-                        >
-                          <BarChart3 className="w-4 h-4 mr-2" />
-                          {t('nav.dashboard')}
-                        </Button>
-                      </Link>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          handleLogout();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="w-full justify-start text-left border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-950/30"
-                      >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        {t('nav.logout')}
-                      </Button>
-                    </div>
-                  ) : (
-                    <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left border-gray-300 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
-                      >
-                        {t('nav.login')}
-                      </Button>
-                    </Link>
-                  )}
                 </div>
 
                 {/* Mobile WhatsApp Actions */}
@@ -977,12 +887,6 @@ export default function HomePage() {
               </h5>
               <ul className="space-y-3 text-gray-400 dark:text-gray-500">
                 <li>
-                  <Link href="/admin" className="hover:text-white transition-colors flex items-center">
-                    <BarChart3 className="w-3 h-3 mr-2" />
-                    {t('footer.items.adminDashboard')}
-                  </Link>
-                </li>
-                <li>
                   <a
                     href="https://myscheme.gov.in"
                     target="_blank"
@@ -995,7 +899,7 @@ export default function HomePage() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/tosif121/schemesetu"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-white transition-colors flex items-center"
