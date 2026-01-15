@@ -4,11 +4,17 @@ Complete guide to deploy SchemeSaathi bot on AWS EC2 Free Tier.
 
 ## 🎁 **AWS Free Tier Benefits**
 
-- **EC2 t2.micro**: 750 hours/month FREE (12 months)
-- **1GB RAM, 1 vCPU**: Sufficient for both bots
+- **EC2 t3.micro**: 750 hours/month FREE (12 months)
+- **2 vCPU, 1GB RAM**: Better performance than t2.micro
 - **30GB EBS Storage**: FREE
 - **15GB Data Transfer**: FREE per month
 - **Perfect for**: Telegram + WhatsApp bot
+
+**Why t3.micro?**
+- ✅ 2 vCPUs (better than t2.micro's 1 vCPU)
+- ✅ Burstable performance
+- ✅ Same price as t2.micro in free tier
+- ✅ Better for running both bots
 
 ## 📋 Prerequisites
 
@@ -27,7 +33,9 @@ Complete guide to deploy SchemeSaathi bot on AWS EC2 Free Tier.
 **Configure Instance:**
 - **Name**: `schemesaathi-bot`
 - **AMI**: Ubuntu Server 22.04 LTS (Free tier eligible)
-- **Instance Type**: `t2.micro` (Free tier eligible)
+- **Instance Type**: `t3.micro` (Free tier eligible) ⭐ RECOMMENDED
+  - Alternative: `t2.micro` (also free tier eligible)
+  - t3.micro has 2 vCPUs vs t2.micro's 1 vCPU
 - **Key Pair**: Create new key pair
   - Name: `schemesaathi-key`
   - Type: RSA
@@ -332,12 +340,18 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
 ### Stay Within Free Tier
 
 **Free Tier Limits:**
-- ✅ 750 hours/month EC2 t2.micro (enough for 24/7)
+- ✅ 750 hours/month EC2 (t3.micro or t2.micro)
+- ✅ Enough for 24/7 operation (744 hours/month)
 - ✅ 30GB EBS storage
 - ✅ 15GB data transfer out
 
+**After Free Tier (12 months):**
+- t3.micro: ~$0.0112/hour = ~$8/month
+- t2.micro: ~$0.0116/hour = ~$8.50/month
+- Still very affordable!
+
 **Tips to Stay Free:**
-1. Use only 1 t2.micro instance
+1. Use only 1 t3.micro or t2.micro instance
 2. Don't exceed 30GB storage
 3. Monitor data transfer
 4. Stop instance when not needed (optional)

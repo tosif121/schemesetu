@@ -1,3 +1,6 @@
+// Load environment variables
+require('dotenv').config();
+
 // Supabase scheme functions for the bot
 const { createClient } = require('@supabase/supabase-js');
 
