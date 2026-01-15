@@ -181,13 +181,18 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 PERPLEXITY_API_KEY=your_perplexity_api_key
 
 # Bot Configuration
-NODE_ENV=development
+NODE_ENV=production
 
 # Message Synchronization Configuration (Optional)
 # Enable to sync messages between Telegram and WhatsApp
+# Note: Set to false to avoid errors before WhatsApp is fully initialized
 MESSAGE_SYNC_ENABLED=false
 SYNC_ADMIN_TELEGRAM_ID=your_telegram_user_id
 SYNC_ADMIN_WHATSAPP_NUMBER=your_whatsapp_number
+
+# Puppeteer Configuration (for WhatsApp)
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 ```
 
 **How to get bot credentials:**
@@ -203,7 +208,8 @@ SYNC_ADMIN_WHATSAPP_NUMBER=your_whatsapp_number
 
 3. **Message Sync** (Optional):
    - Get your Telegram user ID from `@userinfobot`
-   - Use your WhatsApp number with country code
+   - Use your WhatsApp number with country code (without + sign)
+   - **Recommended**: Keep `MESSAGE_SYNC_ENABLED=false` initially
 
 ## 🗄️ **Database Setup**
 
@@ -419,7 +425,48 @@ npm start
 
 **Live**: https://scheme-setu-govt.vercel.app/
 
-### **Unified Bot (Railway.app - Recommended)**
+### **AWS EC2 (Recommended - $100 FREE credits for 6 months!)**
+
+AWS EC2 t3.micro instance is perfect for running both Telegram + WhatsApp bots 24/7.
+
+**Why AWS?**
+- ✅ **$100 FREE credits for 6 months** (AWS Activate/Educate)
+- ✅ **PLUS 12 months free tier** (750 hours/month t3.micro)
+- ✅ t3.micro: 2 vCPU, 1GB RAM
+- ✅ 30GB storage included
+- ✅ Supports Chrome for WhatsApp
+- ✅ After credits: ~$8/month (still very affordable!)
+
+**Quick Deploy:**
+1. Launch EC2 t3.micro instance (Ubuntu 22.04 LTS)
+2. Install Node.js, PM2, Chrome
+3. Clone repository
+4. Configure `.env` file
+5. Start with PM2
+
+**Commands:**
+```bash
+# Install dependencies
+sudo apt update && sudo apt upgrade -y
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs git google-chrome-stable
+sudo npm install -g pm2
+
+# Clone and setup
+git clone https://github.com/tosif121/schemesetu.git
+cd schemesetu/bot
+npm install
+
+# Configure environment
+nano .env  # Add your credentials
+
+# Start bot
+pm2 start unified-bot.js --name schemesaathi
+pm2 save
+pm2 startup
+```
+
+### **Alternative: Railway.app**
 
 Railway supports Docker with Chrome, perfect for both Telegram + WhatsApp bots.
 
@@ -431,18 +478,16 @@ Railway supports Docker with Chrome, perfect for both Telegram + WhatsApp bots.
 5. Add environment variables
 6. Deploy!
 
-**Detailed guide**: See [bot/RAILWAY_DEPLOYMENT.md](bot/RAILWAY_DEPLOYMENT.md)
-
 **Why Railway?**
 - ✅ Supports Chrome/Chromium (required for WhatsApp)
 - ✅ Docker support out of the box
 - ✅ Auto-deploys on git push
 - ✅ Persistent volumes for WhatsApp sessions
-- ✅ $5/month (first $5 free)
+- ✅ ~$5/month
 
 ### **Alternative: VPS Deployment**
 ```bash
-# PM2 (for VPS/DigitalOcean/AWS)
+# PM2 (for VPS/DigitalOcean/Linode)
 npm install -g pm2
 cd bot
 pm2 start unified-bot.js --name "schemesaathi-unified"
@@ -563,7 +608,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **Built with ❤️ for Indian citizens to easily access government schemes in their native language.**
 
-*"सबका साथ, सबका विकास, सबकी भाषा"* - Together, Development, Everyone's Language
+*"सब का साथ, सब का विकास, सब की भाषा"* - Together, Development, Everyone's Language
 
 ---
 
