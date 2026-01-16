@@ -1,6 +1,10 @@
 # SchemeSaathi - AI for Social Impact 🇮🇳
 ## Multilingual Government Schemes Chatbot for myScheme Users
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/badge/GitHub-tosif121%2Fschemesetu-blue)](https://github.com/tosif121/schemesetu)
+[![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red)](https://github.com/tosif121/schemesetu)
+
 **Problem**: Citizens often don't know which government schemes they qualify for due to language barriers and complex portals.
 
 **Solution**: AI-powered WhatsApp/Telegram chatbot that uses myScheme data/APIs to answer eligibility questions via voice/text in local languages.
@@ -595,7 +599,31 @@ schemesetu/
 
 ## 📄 **License**
 
-MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### What this means:
+- ✅ **Free to use** for personal, commercial, or government projects
+- ✅ **Free to modify** and create derivative works
+- ✅ **Free to distribute** and sublicense
+- ✅ **No warranty** - provided "as is"
+- ✅ **Only requirement**: Include the original copyright notice
+
+### Commercial Use
+You are free to:
+- Deploy for your organization
+- Integrate into commercial products
+- Offer as a paid service
+- Create white-label solutions
+
+No permission or licensing fees required!
+
+### Attribution
+While not required, we appreciate:
+- A link back to this repository
+- Mentioning SchemeSaathi in your documentation
+- Sharing improvements with the community
+
+**Built with ❤️ for Indian citizens to easily access government schemes in their native language.**
 
 ## 🆘 **Support**
 
