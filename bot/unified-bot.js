@@ -92,18 +92,12 @@ function clearUserState(userId) {
   userStates.delete(userId);
 }
 
-// Message sync configuration
-const MESSAGE_SYNC_ENABLED = process.env.MESSAGE_SYNC_ENABLED === 'true';
-const SYNC_ADMIN_TELEGRAM_ID = process.env.SYNC_ADMIN_TELEGRAM_ID;
-const SYNC_ADMIN_WHATSAPP_NUMBER = process.env.SYNC_ADMIN_WHATSAPP_NUMBER;
-
 console.log('🚀 Starting SchemeSaathi Unified Bot...');
 console.log('🔧 Initializing services...');
 console.log('📡 Telegram bot configured:', process.env.BOT_TOKEN ? 'Yes' : 'No');
 console.log('📱 WhatsApp client configured: Yes');
 console.log('🗄️ Supabase configured:', process.env.SUPABASE_URL ? 'Yes' : 'No');
 console.log('🤖 Perplexity configured:', process.env.PERPLEXITY_API_KEY ? 'Yes' : 'No');
-console.log('🔄 Message sync enabled:', MESSAGE_SYNC_ENABLED);
 
 // Memory monitoring
 setInterval(() => {
@@ -328,31 +322,6 @@ async function updateUserLanguage(identifier, language, platform) {
   }
 }
 
-// Message sync functions
-async function syncMessageToTelegram(message, fromWhatsApp = false) {
-  if (!MESSAGE_SYNC_ENABLED || !SYNC_ADMIN_TELEGRAM_ID || fromWhatsApp) return;
-  
-  try {
-    const syncMessage = `📱 *WhatsApp Message Sync*\n\n${message}`;
-    await telegramBot.telegram.sendMessage(SYNC_ADMIN_TELEGRAM_ID, syncMessage, { parse_mode: 'Markdown' });
-    console.log('✅ Message synced to Telegram');
-  } catch (error) {
-    console.error('❌ Error syncing to Telegram:', error);
-  }
-}
-
-async function syncMessageToWhatsApp(message, fromTelegram = false) {
-  if (!MESSAGE_SYNC_ENABLED || !SYNC_ADMIN_WHATSAPP_NUMBER || fromTelegram) return;
-  
-  try {
-    const syncMessage = `🤖 *Telegram Message Sync*\n\n${message}`;
-    const chatId = SYNC_ADMIN_WHATSAPP_NUMBER + '@c.us';
-    await whatsappClient.sendMessage(chatId, syncMessage);
-    console.log('✅ Message synced to WhatsApp');
-  } catch (error) {
-    console.error('❌ Error syncing to WhatsApp:', error);
-  }
-}
 
 // AI functions (same as before)
 async function extractEligibility(userInput) {
@@ -1040,9 +1009,6 @@ whatsappClient.on('message', async (message) => {
   
   console.log(`📱 WhatsApp message from ${contact.name || contact.number}: ${messageText}`);
   
-  // Sync message to Telegram if enabled
-  await syncMessageToTelegram(`From: ${contact.name || contact.number}\nMessage: ${messageText}`, true);
-  
   try {
     // Get or create user
     const user = await getOrCreateUser(
@@ -1124,9 +1090,6 @@ whatsappClient.on('message', async (message) => {
       : '\n\n💡 Type *menu* for main menu';
     
     await message.reply(response + menuPrompt);
-    
-    // Sync response to Telegram if enabled
-    await syncMessageToTelegram(`Bot Response: ${response}`, true);
     
   } catch (error) {
     console.error('Error processing WhatsApp message:', error);
@@ -1276,9 +1239,6 @@ telegramBot.start(async (ctx) => {
   
   const language = user?.language_preference || 'en';
   const welcomeMessage = WELCOME_MESSAGES[language] || WELCOME_MESSAGES.en;
-  
-  // Sync message to WhatsApp if enabled
-  await syncMessageToWhatsApp(`New Telegram user started: ${ctx.from.first_name} (@${ctx.from.username})`);
   
   await ctx.replyWithMarkdown(welcomeMessage, createQuickActionKeyboard(language));
 });
@@ -1568,9 +1528,6 @@ telegramBot.on('text', async (ctx) => {
 
   const messageText = ctx.message.text;
   
-  // Sync message to WhatsApp if enabled
-  await syncMessageToWhatsApp(`From: ${ctx.from.first_name} (@${ctx.from.username})\nMessage: ${messageText}`);
-  
   try {
     // Show typing indicator
     await ctx.sendChatAction('typing');
@@ -1589,9 +1546,6 @@ telegramBot.on('text', async (ctx) => {
     const userLanguage = user?.language_preference || 'en';
     
     await ctx.replyWithMarkdown(response, createQuickActionKeyboard(userLanguage));
-    
-    // Sync response to WhatsApp if enabled
-    await syncMessageToWhatsApp(`Bot Response: ${response}`);
     
   } catch (error) {
     console.error('Error processing Telegram message:', error);

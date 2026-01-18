@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 // Translation type
 interface Translations {
@@ -45,14 +45,10 @@ interface LanguageProviderProps {
 export function LanguageProvider({ children }: LanguageProviderProps) {
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [translations, setTranslations] = useState<Translations>({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load language from localStorage on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('preferred-language') || 'en';
-    setLanguage(savedLanguage);
-  }, []);
-
-  const setLanguage = async (lang: string) => {
+  const setLanguage = useCallback(async (lang: string) => {
+    console.log('Setting language to:', lang); // Debug log
     setCurrentLanguage(lang);
     
     try {
@@ -61,6 +57,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       if (response.ok) {
         const loadedTranslations = await response.json();
         setTranslations(loadedTranslations);
+        console.log('Loaded translations for:', lang); // Debug log
       } else {
         // Fallback to Hindi, then English
         const fallbackLang = lang !== 'hi' ? 'hi' : 'en';
@@ -68,6 +65,7 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
         if (fallbackResponse.ok) {
           const fallbackTranslations = await fallbackResponse.json();
           setTranslations(fallbackTranslations);
+          console.log('Loaded fallback translations for:', fallbackLang); // Debug log
         }
       }
     } catch (error) {
@@ -76,8 +74,20 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
       setTranslations({});
     }
     
-    localStorage.setItem('preferred-language', lang);
-  };
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('preferred-language', lang);
+    }
+  }, []);
+
+  // Load language from localStorage on mount
+  useEffect(() => {
+    if (!isInitialized && typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('preferred-language') || 'en';
+      console.log('Loading saved language:', savedLanguage); // Debug log
+      setLanguage(savedLanguage);
+      setIsInitialized(true);
+    }
+  }, [isInitialized, setLanguage]);
 
   // Translation function with parameter substitution and enhanced fallback
   const t = (key: string, params?: Record<string, string>): string => {

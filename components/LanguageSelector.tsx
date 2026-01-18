@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Globe, ChevronDown, Check } from 'lucide-react';
-import { useLanguage } from '@/app/Context/LanguageContext';
+import { useLanguage } from '@/app/context/LanguageContext';
 
 const languages = [
   { code: 'en', name: 'English', native: 'English' },
@@ -40,6 +40,7 @@ export function LanguageSelector({ isScrolled = false }: LanguageSelectorProps) 
   const currentLang = languages.find(lang => lang.code === currentLanguage) || languages[0];
 
   const handleLanguageChange = (locale: string) => {
+    console.log('Language selector: changing to', locale); // Debug log
     setLanguage(locale);
     setIsOpen(false);
   };

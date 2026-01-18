@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Jost } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { LanguageProvider } from '@/app/Context/LanguageContext';
+import { LanguageProvider } from '@/app/context/LanguageContext';
 
 const jostSans = Jost({
   variable: '--font-jost-sans',
