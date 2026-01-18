@@ -127,87 +127,6 @@ export default function HomePage() {
     },
   ];
 
-  const schemes = [
-    {
-      name: 'PM-KISAN',
-      description: 'Direct income support for small and marginal farmers across India',
-      benefit: '₹6,000 per year',
-      category: 'Agriculture',
-      icon: Wheat,
-      beneficiaries: '11+ Crore',
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-950/30',
-      eligibility: 'Small & marginal farmers',
-      launched: '2019',
-      status: 'Active',
-    },
-    {
-      name: 'Ayushman Bharat',
-      description: 'Comprehensive health insurance coverage for economically vulnerable families',
-      benefit: '₹5 lakh coverage',
-      category: 'Healthcare',
-      icon: Stethoscope,
-      beneficiaries: '50+ Crore',
-      color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-50 dark:bg-red-950/30',
-      eligibility: 'BPL families',
-      launched: '2018',
-      status: 'Active',
-    },
-    {
-      name: 'National Scholarship',
-      description: 'Financial assistance for students from economically weaker sections',
-      benefit: 'Up to ₹2 lakh',
-      category: 'Education',
-      icon: GraduationCap,
-      beneficiaries: '1+ Crore',
-      color: 'text-[#4299eb] dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-950/30',
-      eligibility: 'Merit-based students',
-      launched: '2008',
-      status: 'Active',
-    },
-    {
-      name: 'PM Awas Yojana',
-      description: 'Housing for all initiative providing affordable homes to urban and rural poor',
-      benefit: 'Up to ₹2.5 lakh subsidy',
-      category: 'Housing',
-      icon: Building2,
-      beneficiaries: '2+ Crore',
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-950/30',
-      eligibility: 'EWS/LIG families',
-      launched: '2015',
-      status: 'Active',
-    },
-    {
-      name: 'Mudra Yojana',
-      description: 'Micro-finance scheme for small businesses and entrepreneurs',
-      benefit: 'Up to ₹10 lakh loan',
-      category: 'Business',
-      icon: Target,
-      beneficiaries: '34+ Crore',
-      color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-50 dark:bg-orange-950/30',
-      eligibility: 'Small entrepreneurs',
-      launched: '2015',
-      status: 'Active',
-    },
-    {
-      name: 'Beti Bachao Beti Padhao',
-      description: 'Initiative to improve child sex ratio and promote girls education',
-      benefit: 'Education support',
-      category: 'Women & Child',
-      icon: Heart,
-      beneficiaries: '5+ Crore',
-      color: 'text-pink-600 dark:text-pink-400',
-      bgColor: 'bg-pink-50 dark:bg-pink-950/30',
-      eligibility: 'Girl children',
-      launched: '2015',
-      status: 'Active',
-    },
-  ];
-
   const stats = [
     { label: t('stats.languages'), value: '15+', icon: Languages },
     { label: t('stats.schemes'), value: '500+', icon: Building2 },
@@ -591,7 +510,7 @@ export default function HomePage() {
                     >
                       {lang}
                     </Badge>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -689,19 +608,15 @@ export default function HomePage() {
       </section>
 
       {/* Bot Contact Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-[#4299eb] to-blue-600 text-white">
+      <section className="py-16 md:py-24 bg-linear-to-br from-[#4299eb] to-blue-600 text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12 md:mb-16">
             <Badge className="mb-6 bg-white/20 text-white border-0 hover:bg-white/20 px-4 py-2 text-sm font-semibold">
               <Bot className="mr-2 h-4 w-4" />
               {t('botContact.badge')}
             </Badge>
-            <h3 className="text-4xl md:text-5xl font-bold mb-6">
-              {t('botContact.title')}
-            </h3>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              {t('botContact.subtitle')}
-            </p>
+            <h3 className="text-4xl md:text-5xl font-bold mb-6">{t('botContact.title')}</h3>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">{t('botContact.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -710,11 +625,7 @@ export default function HomePage() {
               <CardContent className="p-8 text-center">
                 <div className="mb-6">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
-                    <img
-                      src="/images/whatsapp.png"
-                      alt="WhatsApp"
-                      className="h-10 w-10 filter brightness-0 invert"
-                    />
+                    <img src="/images/whatsapp.png" alt="WhatsApp" className="h-10 w-10 filter brightness-0 invert" />
                   </div>
                   <h4 className="text-2xl font-bold text-white mb-2">{t('botContact.whatsapp.title')}</h4>
                   <p className="text-blue-100 mb-4">{t('botContact.whatsapp.description')}</p>
