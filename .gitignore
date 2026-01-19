@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -35,12 +35,11 @@ yarn-error.log*
 !.env.example
 
 # bot specific
-bot/.env
-bot/.env.*
-!bot/.env.example
-bot/.wwebjs_auth/
-bot/.wwebjs_cache/
-bot/node_modules/
+backend/bot/.env
+backend/bot/.env.*
+!backend/bot/.env.example
+backend/bot/.wwebjs_auth/
+backend/bot/.wwebjs_cache/
 
 # vercel
 .vercel
