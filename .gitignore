@@ -35,11 +35,11 @@ yarn-error.log*
 !.env.example
 
 # bot specific
-backend/bot/.env
-backend/bot/.env.*
-!backend/bot/.env.example
-backend/bot/.wwebjs_auth/
-backend/bot/.wwebjs_cache/
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/.wwebjs_auth/
+backend/.wwebjs_cache/
 
 # vercel
 .vercel

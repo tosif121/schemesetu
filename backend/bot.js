@@ -11,7 +11,7 @@ const {
   getSchemesByGender,
   logSchemeInteraction,
   logConversation
-} = require('../../bot/supabase-schemes');
+} = require('./supabase-schemes');
 require('dotenv').config();
 
 // Initialize services
@@ -111,7 +111,7 @@ async function safeReply(message, text) {
 
     console.log(`Attempting to send message to ${message.from}`);
     // Use sendMessage instead of reply to avoid potential issues with message object
-    await whatsappClient.sendMessage(message.from, text);
+    await client.sendMessage(message.from, text);
     console.log('Message sent successfully');
   } catch (error) {
     console.error('Failed to reply to WhatsApp message:', error.message);
@@ -898,7 +898,7 @@ async function handleWhatsAppButtonClick(buttonId, contact, message, userLanguag
   
   // Send secondary buttons for more options
   try {
-    await whatsappClient.sendMessage(message.from, createWhatsAppSecondaryButtons(userLanguage));
+    await client.sendMessage(message.from, createWhatsAppSecondaryButtons(userLanguage));
   } catch (error) {
     console.log('Interactive buttons not supported, using text menu');
   }
@@ -986,7 +986,7 @@ async function handleWhatsAppMenuSelection(selection, contact, message, userLang
   
   // Send secondary buttons for more options
   try {
-    await whatsappClient.sendMessage(message.from, createWhatsAppSecondaryButtons(userLanguage));
+    await client.sendMessage(message.from, createWhatsAppSecondaryButtons(userLanguage));
   } catch (error) {
     console.log('Interactive buttons not supported, using text menu');
   }
@@ -1166,14 +1166,14 @@ client.on('message_create', async (message) => {
           hi: `✅ भाषा ${LANGUAGES[selectedLanguage]?.native} में सेट की गई!\n\n${createWhatsAppMainMenu(selectedLanguage)}`
         };
 
-        await whatsappClient.sendMessage(
+        await client.sendMessage(
           message.from,
           confirmMessages[selectedLanguage] || confirmMessages.en
         );
 
         // Send interactive buttons
         try {
-          await whatsappClient.sendMessage(message.from, createWhatsAppButtons(selectedLanguage));
+          await client.sendMessage(message.from, createWhatsAppButtons(selectedLanguage));
         } catch (error) {
           console.log('Interactive buttons not supported');
         }
@@ -1184,7 +1184,7 @@ client.on('message_create', async (message) => {
   }
 });
 
-whatsappClient.on('disconnected', (reason) => {
+client.on('disconnected', (reason) => {
   console.log('❌ WhatsApp Client was logged out:', reason);
 });
 
@@ -1616,7 +1616,7 @@ async function startUnifiedBot() {
   try {
     // Start WhatsApp client
     console.log('🔄 Initializing WhatsApp client...');
-    await whatsappClient.initialize();
+    await client.initialize();
     
     // Start Telegram bot
     console.log('🔄 Starting Telegram bot...');
@@ -1651,7 +1651,7 @@ process.once('SIGINT', async () => {
   console.log('\n🛑 Stopping unified bot...');
   
   try {
-    await whatsappClient.destroy();
+    await client.destroy();
     console.log('✅ WhatsApp client stopped');
   } catch (error) {
     console.error('❌ Error stopping WhatsApp client:', error);
@@ -1675,7 +1675,7 @@ process.once('SIGTERM', async () => {
   console.log('\n🛑 Stopping unified bot...');
   
   try {
-    await whatsappClient.destroy();
+    await client.destroy();
     telegramBot.stop('SIGTERM');
     userStates.clear();
   } catch (error) {
