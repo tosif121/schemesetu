@@ -11,16 +11,24 @@ const {
   getSchemesByGender,
   logSchemeInteraction,
   logConversation
-} = require('./supabase-schemes');
+} = require('../../bot/supabase-schemes');
 require('dotenv').config();
 
 // Initialize services
 const telegramBot = new Telegraf(process.env.BOT_TOKEN);
-const whatsappClient = new Client({
+const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu'
+    ]
   }
 });
 
@@ -90,6 +98,26 @@ function getUserState(userId) {
 // Clear user state
 function clearUserState(userId) {
   userStates.delete(userId);
+}
+
+// Safe reply function to handle WhatsApp library errors
+async function safeReply(message, text) {
+  try {
+    if (!message || !message.from) {
+      console.error('Failed to reply to WhatsApp message: Invalid message object or missing sender');
+      console.error('Message object:', typeof message, message ? Object.keys(message) : 'null/undefined');
+      return;
+    }
+
+    console.log(`Attempting to send message to ${message.from}`);
+    // Use sendMessage instead of reply to avoid potential issues with message object
+    await whatsappClient.sendMessage(message.from, text);
+    console.log('Message sent successfully');
+  } catch (error) {
+    console.error('Failed to reply to WhatsApp message:', error.message);
+    console.error('Error details:', error);
+    // Don't crash, just log the error
+  }
 }
 
 console.log('🚀 Starting SchemeSaathi Unified Bot...');
@@ -920,18 +948,18 @@ async function handleWhatsAppMenuSelection(selection, contact, message, userLang
       
     case '6': // Change Language
       setUserState(contact.number, 'language_selection');
-      await message.reply(createWhatsAppLanguageMenu());
+      await safeReply(message, createWhatsAppLanguageMenu());
       return;
       
     case '7': // Help
-      await message.reply(createWhatsAppHelpMenu(userLanguage));
+      await safeReply(message, createWhatsAppHelpMenu(userLanguage));
       return;
       
     default:
       response = userLanguage === 'hi' 
         ? '❌ अमान्य विकल्प। कृपया 1-7 के बीच संख्या चुनें।\n\n' + createWhatsAppMainMenu(userLanguage)
         : '❌ Invalid option. Please choose a number between 1-7.\n\n' + createWhatsAppMainMenu(userLanguage);
-      await message.reply(response);
+      await safeReply(message, response);
       return;
   }
   
@@ -954,7 +982,7 @@ async function handleWhatsAppMenuSelection(selection, contact, message, userLang
       : '❌ No schemes available for this category. Please try other options.\n\n' + createWhatsAppMainMenu(userLanguage);
   }
   
-  await message.reply(response);
+  await safeReply(message, response);
   
   // Send secondary buttons for more options
   try {
@@ -990,166 +1018,169 @@ async function handleWhatsAppLanguageSelection(selection, contact, message) {
 }
 
 // WhatsApp Client Setup
-whatsappClient.on('qr', (qr) => {
+client.on('qr', (qr) => {
   console.log('📱 WhatsApp QR Code:');
   qrcode.generate(qr, { small: true });
   console.log('Scan this QR code with your WhatsApp to connect');
 });
 
-whatsappClient.on('ready', () => {
+client.on('ready', () => {
   console.log('✅ WhatsApp Client is ready!');
 });
 
-whatsappClient.on('message', async (message) => {
-  // Skip if message is from status broadcast or groups
-  if (message.from === 'status@broadcast' || message.isGroupMsg) return;
-  
-  const contact = await message.getContact();
-  const messageText = message.body.trim();
-  
-  console.log(`📱 WhatsApp message from ${contact.name || contact.number}: ${messageText}`);
-  
-  try {
-    // Get or create user
-    const user = await getOrCreateUser(
-      contact.number,
-      contact.name || contact.number,
-      null,
-      'whatsapp'
-    );
-    const userLanguage = user?.language_preference || 'en';
-    
-    // Handle special commands and greetings
-    const lowerText = messageText.toLowerCase();
-    if (lowerText === 'menu' || lowerText === 'start' || lowerText === 'hi' || lowerText === 'hello' || lowerText === 'hey' || lowerText === 'namaste') {
-      await message.reply(createWhatsAppMainMenu(userLanguage));
-      return;
+// Handle incoming messages with error handling
+client.on('message', async (message) => {
+    try {
+        // Skip status messages
+        if (message.from === 'status@broadcast') return;
+
+        const contact = await message.getContact();
+        console.log(`📱 WhatsApp message from ${contact.name || contact.number}: ${message.body}`);
+
+        // Get or create user
+        const user = await getOrCreateUser(
+          contact.number,
+          contact.name || contact.number,
+          null,
+          'whatsapp'
+        );
+        const userLanguage = user?.language_preference || 'en';
+
+        // Handle special commands and greetings
+        const lowerText = message.body.toLowerCase();
+        if (lowerText === 'menu' || lowerText === 'start' || lowerText === 'hi' || lowerText === 'hello' || lowerText === 'hey' || lowerText === 'namaste') {
+          await message.reply(createWhatsAppMainMenu(userLanguage));
+          return;
+        }
+
+        if (message.body.toLowerCase() === 'help') {
+          await message.reply(createWhatsAppHelpMenu(userLanguage));
+          return;
+        }
+
+        if (message.body.toLowerCase() === 'language') {
+          try {
+            await client.sendMessage(message.from, createWhatsAppLanguageList());
+          } catch (error) {
+            await message.reply(createWhatsAppLanguageMenu());
+          }
+          return;
+        }
+
+        // Handle menu selections (1-7) and language selections (8-10)
+        if (/^([1-9]|10)$/.test(message.body)) {
+          const selection = parseInt(message.body);
+          const currentState = getUserState(contact.number);
+
+          // Check if user is in language selection mode
+          if (currentState === 'language_selection') {
+            await handleWhatsAppLanguageSelection(message.body, contact, message);
+            clearUserState(contact.number);
+            return;
+          }
+
+          if (selection >= 1 && selection <= 7) {
+            // Quick actions menu
+            await handleWhatsAppMenuSelection(message.body, contact, message, userLanguage);
+            return;
+          } else if (selection >= 8 && selection <= 10) {
+            // Language selection for numbers 8-10
+            await handleWhatsAppLanguageSelection(message.body, contact, message);
+            return;
+          }
+        }
+
+        // Handle first-time users or simple greetings
+        if (!user || message.body.length <= 15) {
+          // Check if it's a simple greeting or first interaction
+          const greetings = ['hi', 'hello', 'hey', 'namaste', 'namaskar', 'hola', 'good morning', 'good evening', 'menu', 'start'];
+          const isGreeting = greetings.some(greeting => lowerText.includes(greeting));
+
+          if (isGreeting || !user) {
+            await message.reply(createWhatsAppMainMenu(userLanguage));
+            return;
+          }
+        }
+
+        // Process regular messages (eligibility queries)
+        const response = await processMessage(
+          message.body,
+          contact.number,
+          contact.name || contact.number,
+          null,
+          'whatsapp'
+        );
+
+        // Send quick action buttons after response
+        const menuPrompt = userLanguage === 'hi'
+          ? '\n\n💡 मुख्य मेनू के लिए *menu* टाइप करें'
+          : '\n\n💡 Type *menu* for main menu';
+
+        await message.reply(response + menuPrompt);
+
+    } catch (error) {
+        console.error('❌ Error handling WhatsApp message:', error.message);
+        // Don't reply on error to avoid infinite loops
     }
-    
-    if (messageText.toLowerCase() === 'help') {
-      await message.reply(createWhatsAppHelpMenu(userLanguage));
-      return;
-    }
-    
-    if (messageText.toLowerCase() === 'language') {
-      try {
-        await whatsappClient.sendMessage(message.from, createWhatsAppLanguageList());
-      } catch (error) {
-        await message.reply(createWhatsAppLanguageMenu());
-      }
-      return;
-    }
-    
-    // Handle menu selections (1-7) and language selections (8-10)
-    if (/^([1-9]|10)$/.test(messageText)) {
-      const selection = parseInt(messageText);
-      const currentState = getUserState(contact.number);
-      
-      // Check if user is in language selection mode
-      if (currentState === 'language_selection') {
-        await handleWhatsAppLanguageSelection(messageText, contact, message);
-        clearUserState(contact.number);
-        return;
-      }
-      
-      if (selection >= 1 && selection <= 7) {
-        // Quick actions menu
-        await handleWhatsAppMenuSelection(messageText, contact, message, userLanguage);
-        return;
-      } else if (selection >= 8 && selection <= 10) {
-        // Language selection for numbers 8-10
-        await handleWhatsAppLanguageSelection(messageText, contact, message);
-        return;
-      }
-    }
-    
-    // Handle first-time users or simple greetings
-    if (!user || messageText.length <= 15) {
-      // Check if it's a simple greeting or first interaction
-      const greetings = ['hi', 'hello', 'hey', 'namaste', 'namaskar', 'hola', 'good morning', 'good evening', 'menu', 'start'];
-      const isGreeting = greetings.some(greeting => lowerText.includes(greeting));
-      
-      if (isGreeting || !user) {
-        await message.reply(createWhatsAppMainMenu(userLanguage));
-        return;
-      }
-    }
-    
-    // Process regular messages (eligibility queries)
-    const response = await processMessage(
-      messageText,
-      contact.number,
-      contact.name || contact.number,
-      null,
-      'whatsapp'
-    );
-    
-    // Send quick action buttons after response
-    const menuPrompt = userLanguage === 'hi' 
-      ? '\n\n💡 मुख्य मेनू के लिए *menu* टाइप करें'
-      : '\n\n💡 Type *menu* for main menu';
-    
-    await message.reply(response + menuPrompt);
-    
-  } catch (error) {
-    console.error('Error processing WhatsApp message:', error);
-    
-    const errorMessages = {
-      en: '❌ Sorry, I encountered an error. Please try again or type *help* for assistance.',
-      hi: '❌ माफ करें, मुझे एक त्रुटि का सामना करना पड़ा। कृपया पुनः प्रयास करें या सहायता के लिए *help* टाइप करें।'
-    };
-    
-    await message.reply(errorMessages.en);
-  }
 });
 
 // Handle WhatsApp button interactions
-whatsappClient.on('message_create', async (message) => {
+client.on('message_create', async (message) => {
+  // Validate message object
+  if (!message || !message.from) {
+    console.error('Invalid WhatsApp message_create object received');
+    return;
+  }
+
   // Handle button responses and interactive list selections
   if (message.fromMe) return; // Skip messages sent by the bot
-  
-  const contact = await message.getContact();
-  
-  // Check if this is a button response
-  if (message.selectedButtonId) {
-    console.log(`📱 WhatsApp button clicked: ${message.selectedButtonId}`);
-    
-    const user = await getOrCreateUser(
-      contact.number,
-      contact.name || contact.number,
-      null,
-      'whatsapp'
-    );
-    const userLanguage = user?.language_preference || 'en';
-    
-    await handleWhatsAppButtonClick(message.selectedButtonId, contact, message, userLanguage);
-  }
-  
-  // Check if this is a list selection
-  if (message.selectedRowId) {
-    console.log(`📱 WhatsApp list item selected: ${message.selectedRowId}`);
-    
-    if (message.selectedRowId.startsWith('lang_')) {
-      const selectedLanguage = message.selectedRowId.replace('lang_', '');
-      await updateUserLanguage(contact.number, selectedLanguage, 'whatsapp');
-      
-      const confirmMessages = {
-        en: `✅ Language set to ${LANGUAGES[selectedLanguage]?.name}!\n\n${createWhatsAppMainMenu(selectedLanguage)}`,
-        hi: `✅ भाषा ${LANGUAGES[selectedLanguage]?.native} में सेट की गई!\n\n${createWhatsAppMainMenu(selectedLanguage)}`
-      };
-      
-      await whatsappClient.sendMessage(
-        message.from, 
-        confirmMessages[selectedLanguage] || confirmMessages.en
+
+  try {
+    const contact = await message.getContact();
+
+    // Check if this is a button response
+    if (message.selectedButtonId) {
+      console.log(`📱 WhatsApp button clicked: ${message.selectedButtonId}`);
+
+      const user = await getOrCreateUser(
+        contact?.number || 'unknown',
+        contact?.name || contact?.number || 'unknown',
+        null,
+        'whatsapp'
       );
-      
-      // Send interactive buttons
-      try {
-        await whatsappClient.sendMessage(message.from, createWhatsAppButtons(selectedLanguage));
-      } catch (error) {
-        console.log('Interactive buttons not supported');
+      const userLanguage = user?.language_preference || 'en';
+
+      await handleWhatsAppButtonClick(message.selectedButtonId, contact, message, userLanguage);
+    }
+
+    // Check if this is a list selection
+    if (message.selectedRowId) {
+      console.log(`📱 WhatsApp list item selected: ${message.selectedRowId}`);
+
+      if (message.selectedRowId.startsWith('lang_')) {
+        const selectedLanguage = message.selectedRowId.replace('lang_', '');
+        await updateUserLanguage(contact?.number || 'unknown', selectedLanguage, 'whatsapp');
+
+        const confirmMessages = {
+          en: `✅ Language set to ${LANGUAGES[selectedLanguage]?.name}!\n\n${createWhatsAppMainMenu(selectedLanguage)}`,
+          hi: `✅ भाषा ${LANGUAGES[selectedLanguage]?.native} में सेट की गई!\n\n${createWhatsAppMainMenu(selectedLanguage)}`
+        };
+
+        await whatsappClient.sendMessage(
+          message.from,
+          confirmMessages[selectedLanguage] || confirmMessages.en
+        );
+
+        // Send interactive buttons
+        try {
+          await whatsappClient.sendMessage(message.from, createWhatsAppButtons(selectedLanguage));
+        } catch (error) {
+          console.log('Interactive buttons not supported');
+        }
       }
     }
+  } catch (error) {
+    console.error('Error processing WhatsApp message_create event:', error);
   }
 });
 
