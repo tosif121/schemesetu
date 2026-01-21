@@ -22,9 +22,7 @@
 
 ## 🎬 **Demo Video**
 
-[![Demo Video](https://img.shields.io/badge/▶️_Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/tosif121/schemesetu/raw/main/frontend/public/video/demo.mp4)
-
-**Direct Link**: [demo.mp4](frontend/public/video/demo.mp4)
+[![Demo Video](https://img.shields.io/badge/▶️_Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/8yuUFMFeqJY)
 
 *Watch how SchemeSaathi helps citizens discover government schemes in their native language through WhatsApp and Telegram bots.*
 
