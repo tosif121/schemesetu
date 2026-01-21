@@ -20,6 +20,14 @@
 - **📱 Telegram Bot**: https://t.me/schemesetu_bot  
 - **💬 WhatsApp Bot**: +91 78500 06956
 
+## 🎬 **Demo Video**
+
+[![Demo Video](https://img.shields.io/badge/▶️_Watch_Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/tosif121/schemesetu/raw/main/frontend/public/video/demo.mp4)
+
+**Direct Link**: [demo.mp4](frontend/public/video/demo.mp4)
+
+*Watch how SchemeSaathi helps citizens discover government schemes in their native language through WhatsApp and Telegram bots.*
+
 ## 🏗️ **Project Structure**
 
 ```
